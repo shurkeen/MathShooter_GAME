@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QFrame>
 #include <QPushButton>
+#include <QLabel>
+#include <QLineEdit>
 #include "field.h"
 
 class Game : public QWidget
@@ -13,10 +15,11 @@ public:
     void initGame();
 
 private:
-    Field* field;
-    QPushButton* btn;
-    QPushButton* btn2;
-    QPushButton* btn3;
+    Field* m_field;
+    QPushButton* fireBtn;
+    QPushButton* quitBtn;
+    QLineEdit* functionInput;
+    QLabel* historyInput;
 };
 
 #endif // GAME_H

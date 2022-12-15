@@ -10,19 +10,31 @@
 Game::Game(QWidget* parent) : QWidget(parent)
 {
     resize(900, 600);
-    setFixedSize(size());
+    //setFixedSize(size());
 
-    field = new Field(this);
+    m_field = new Field(this);
 
-    btn = new QPushButton("button");
-    btn2 = new QPushButton("button2");
-    btn3 = new QPushButton("button3");
+    fireBtn = new QPushButton("Fire");
+    quitBtn = new QPushButton("Quit");
+
+    functionInput = new QLineEdit();
+    functionInput->setFixedSize(500, 20);
+
+    historyInput = new QLabel();
+    historyInput->setFrameStyle(QFrame::Box);
+
+    QVBoxLayout* layoutLeft = new QVBoxLayout;
+    layoutLeft->addWidget(functionInput);
+    layoutLeft->addWidget(fireBtn);
+    layoutLeft->addWidget(quitBtn);
+
+    QHBoxLayout* layoutBack = new QHBoxLayout;
+    layoutBack->addLayout(layoutLeft);
+    layoutBack->addWidget(historyInput);
 
     QVBoxLayout* layout = new QVBoxLayout;
-    layout->addWidget(field);
-    layout->addWidget(btn);
-    layout->addWidget(btn2);
-    layout->addWidget(btn3);
+    layout->addWidget(m_field);
+    layout->addLayout(layoutBack);
 
     this->setLayout(layout);
 
@@ -31,5 +43,6 @@ Game::Game(QWidget* parent) : QWidget(parent)
 
 void Game::initGame()
 {
-    field->updateField();
+    m_field->updateField();
+    // цикл перехода хода игроков
 }

@@ -2,6 +2,7 @@
 
 Field::Field(QWidget* parent) : QFrame(parent)
 {
+    setFixedSize(900, 500);
     fieldFrame = new QFrame(this);
     fieldFrame->setFrameStyle(QFrame::Box);
 
