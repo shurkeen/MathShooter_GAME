@@ -11,8 +11,7 @@ SOURCES += \
 
 HEADERS += \
     field.h \
-    game.h \
-    tasklist.h
+    game.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

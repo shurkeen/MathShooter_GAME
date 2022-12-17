@@ -40,7 +40,7 @@ Game::Game(QWidget* parent) : QWidget(parent)
         this->setLayout(layout);
     }
 
-    {
+    { // связь изменений массивов декартовых координат между классами Game и Fiedl
         connect(this, &Game::coordUpdated, this->m_field, [this]{this->m_field->updateCoordGraph(this->m_dots);});
     }
 
@@ -57,15 +57,13 @@ void Game::initGame()
 void Game::gettingCoord()
 {
     m_dots.clear();
-    m_dots.resize(1000);
-    for(int i = 0; i < 1000; i++){
-        m_dots[i].rx() = i;
-        m_dots[i].ry() = i;
+    int sz = 500;
+    m_dots.resize(sz);
+    double h = 0.05;
+    for(int i = 0; i < sz; i++){
+        m_dots[i].first = -25.0 + h;
+        m_dots[i].second = 1.0;
+        h += 0.05;
     }
     emit this->coordUpdated();
-}
-
-void Game::testt(QVector<int> zzz)
-{
-    qDebug() << "XXXXX ZZZZZ.  " << zzz[0];
 }

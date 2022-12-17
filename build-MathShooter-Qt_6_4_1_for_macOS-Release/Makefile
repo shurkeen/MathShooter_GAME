@@ -312,6 +312,7 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/qt_config.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang/qmake.conf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_post.prf \
+		../MathShooter/.qmake.stash \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/exclusive_builds.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/mac/sdk.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/toolchain.prf \
@@ -341,8 +342,7 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/yacc.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/lex.prf \
 		../MathShooter/MathShooter.pro ../MathShooter/field.h \
-		../MathShooter/game.h \
-		tasklist.h ../MathShooter/field.cpp \
+		../MathShooter/game.h ../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
 		../MathShooter/main.cpp
 QMAKE_TARGET  = MathShooter
@@ -353,7 +353,7 @@ TARGET        = MathShooter.app/Contents/MacOS/MathShooter
 EXPORT_QMAKE_MAC_SDK = macosx
 EXPORT_QMAKE_MAC_SDK_VERSION = 12.3
 EXPORT_QMAKE_XCODE_DEVELOPER_PATH = /Library/Developer/CommandLineTools
-EXPORT__QMAKE_STASH_ = 
+EXPORT__QMAKE_STASH_ = /Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/build-MathShooter-Qt_6_4_1_for_macOS-Release/.qmake.stash
 EXPORT_VALID_ARCHS = x86_64 arm64
 EXPORT_DEFAULT_ARCHS = x86_64
 EXPORT_ARCHS = $(filter $(EXPORT_VALID_ARCHS), $(if $(ARCHS), $(ARCHS), $(if $(EXPORT_DEFAULT_ARCHS), $(EXPORT_DEFAULT_ARCHS), $(EXPORT_VALID_ARCHS))))
@@ -620,6 +620,7 @@ Makefile: ../MathShooter/MathShooter.pro /Users/aleksandrdudin/Qt/6.4.1/macos/mk
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/qt_config.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang/qmake.conf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/exclusive_builds.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/mac/sdk.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/toolchain.prf \
@@ -904,6 +905,7 @@ Makefile: ../MathShooter/MathShooter.pro /Users/aleksandrdudin/Qt/6.4.1/macos/mk
 /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/qt_config.prf:
 /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang/qmake.conf:
 /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/exclusive_builds.prf:
 /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/mac/sdk.prf:
 /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/toolchain.prf:
@@ -965,7 +967,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h tasklist.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/main.cpp $(DISTDIR)/
 
 
@@ -976,6 +978,7 @@ clean: compiler_clean
 
 distclean: clean 
 	-$(DEL_FILE) -r MathShooter.app
+	-$(DEL_FILE) .qmake.stash
 	-$(DEL_FILE) Makefile
 
 
@@ -1004,6 +1007,8 @@ moc_field.cpp: ../MathShooter/field.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/qpainter.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
 	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/field.h -o moc_field.cpp
 
@@ -1025,6 +1030,8 @@ moc_game.cpp: ../MathShooter/game.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/qpainter.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
 	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/game.h -o moc_game.cpp
 
@@ -1052,7 +1059,9 @@ field.o: ../MathShooter/field.cpp ../MathShooter/field.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/QPainter \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/qpainter.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o field.o ../MathShooter/field.cpp
 
 game.o: ../MathShooter/game.cpp ../MathShooter/game.h \
@@ -1073,6 +1082,8 @@ game.o: ../MathShooter/game.cpp ../MathShooter/game.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/qpainter.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
@@ -1103,6 +1114,8 @@ main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidge
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/qpainter.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QHBoxLayout \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qboxlayout.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MathShooter/main.cpp

@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QPainter>
 #include <QSignalMapper>
+#include <QPair>
 
 class Field : public QFrame
 {
@@ -14,7 +15,7 @@ public:
     void updateField();
 
 public slots:
-    void updateCoordGraph(QVector<QPoint> m_dots);
+    void updateCoordGraph(const QVector<QPair<double, double>>& m_dots);
 
 protected:
     void timerEvent(QTimerEvent*) override;
@@ -23,6 +24,10 @@ protected:
 
 private:
     static const int DELAY = 5;
+    constexpr static const double X_LENGTH = 50.0;
+    constexpr static const double Y_LENGTH = 30.0;
+    double distFactorForX;
+    double distFactorForY;
 
     int timerId;
     int idxPoint;
@@ -30,10 +35,17 @@ private:
     void doDrawing();
     void graphDrawing();
     void dekartSystemDrawing();
+    void convertToScreenSystem();
+    int convertX_Axes(double);
+    int convertY_Axes(double);
+    void updateDistFactor();
+    bool checkingOutside(QPoint point);
+    bool endLength();
+    void endDrawingGraph();
 
     QVector<QPoint> m_dots;
     QVector<QPoint> tempLineDots;
-    QVector<QPoint> dekartDots;
+    QVector<QPair<double, double>> dekartDots;
     QFrame* fieldFrame;
     QPainter paint;
 };

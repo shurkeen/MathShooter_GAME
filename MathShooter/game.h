@@ -21,16 +21,13 @@ public:
 signals:
     void coordUpdated();
 
-public slots:
-    void testt(QVector<int> zzz);
-
 private:
     Field* m_field;
     QPushButton* fireBtn;
     QPushButton* quitBtn;
     QLineEdit* functionInput;
     QLabel* historyInput;
-    QVector<QPoint> m_dots;
+    QVector<QPair<double, double> > m_dots;
 };
 
 #endif // GAME_H
