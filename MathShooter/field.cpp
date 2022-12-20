@@ -39,8 +39,8 @@ void Field::doDrawing()
 
     { // отрисовка графика функции
         tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint++]);
-        if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1])
-                && !checkingIntersectionWithPlayers(dekartDotsGraph[idxPoint - 1])){
+        attemptToKill(dekartDotsGraph[idxPoint]);
+        if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1])){
             graphDrawing();
         }
         else{
@@ -68,11 +68,11 @@ void Field::playersDrawing()
 {
     m_paint.begin(this);
 
-    for(int i = 0; i < m_players.size(); i++){
-        for(int j = 1; j < m_players[i].screenDotsPlayer.size(); j++){
-            m_paint.drawLine(m_players[i].screenDotsPlayer[j - 1], m_players[i].screenDotsPlayer[j]);
-        }
-    }
+//    for(int i = 0; i < m_players.size(); i++){
+//        for(int j = 1; j < m_players[i].screenDotsPlayer.size(); j++){
+//            m_paint.drawLine(m_players[i].screenDotsPlayer[j - 1], m_players[i].screenDotsPlayer[j]);
+//        }
+//    }
 
     m_paint.setPen(QPen(Qt::green,Qt::SolidLine));
     m_paint.setBrush(Qt::yellow);
@@ -129,17 +129,25 @@ bool Field::checkingOutside(QPair<double, double> point)
     return false;
 }
 
-bool Field::checkingIntersectionWithPlayers(QPair<double, double> point)
+bool Field::checkingIntersectionWithPlayers(QPair<double, double> point, int idxPlayer)
 {
-    for(int i = 0; i < m_players.size(); i++){
-        for(int j = 0; j < m_players[i].dekartDotsPlayer.size(); j++){
-            if(fabs(point.first - m_players[i].dekartDotsPlayer[j].first) +
-               fabs(point.second - m_players[i].dekartDotsPlayer[j].second) < 1e-4){
-                return true;
-            }
+    for(int j = 0; j < m_players[idxPlayer].dekartDotsPlayer.size(); j++){
+        if(fabs(point.first - m_players[idxPlayer].dekartDotsPlayer[j].first) +
+           fabs(point.second - m_players[idxPlayer].dekartDotsPlayer[j].second) < KILL_EPS){
+            return true;
         }
     }
     return false;
+}
+
+void Field::attemptToKill(QPair<double, double> point)
+{
+    for(int i = 0; i < m_players.size(); i++){
+        if(checkingIntersectionWithPlayers(point, i)){
+            auto it = m_players.begin() + i;
+            m_players.erase(it);
+        }
+    }
 }
 
 bool Field::endLength()
@@ -183,9 +191,9 @@ void Field::initCenterPosForPlayers()
 
 void Field::initDotsForPlayers()
 {
-    for(int i = 0; i < 1; i++){
-        double x0 = -5;
-        double y0 = 0;
+    for(int i = 0; i < m_players.size(); i++){
+        double x0 = m_players[i].centerPosDekartX;
+        double y0 = m_players[i].centerPosDekartY;
         double r = m_players[i].M_RADIUS;
         double w = r;
         double h = 0;

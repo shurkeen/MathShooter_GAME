@@ -28,6 +28,7 @@ protected:
 
 private:
     static const int DELAY = 1;
+    constexpr static const double KILL_EPS = 2e-3;
     constexpr static const double X_LENGTH = 50.0;
     constexpr static const double Y_LENGTH = 30.0;
     double distFactorForX;
@@ -45,7 +46,8 @@ private:
     int convertY_Axes(double);
     void updateDistFactor();
     bool checkingOutside(QPair<double, double> point);
-    bool checkingIntersectionWithPlayers(QPair<double, double> point);
+    bool checkingIntersectionWithPlayers(QPair<double, double>, int);
+    void attemptToKill(QPair<double, double> point);
     bool endLength();
     void endDrawingGraph();
     void initPlayers();
