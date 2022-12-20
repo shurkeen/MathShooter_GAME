@@ -77,7 +77,7 @@ void Field::playersDrawing()
     m_paint.setPen(QPen(Qt::green,Qt::SolidLine));
     m_paint.setBrush(Qt::yellow);
     for(int i = 0; i < m_players.size(); i++){
-        m_paint.drawEllipse(m_players[i].centerPosScreenX - 13, m_players[i].centerPosScreenY - 13, 25, 25);
+        m_paint.drawEllipse(m_players[i].getCenterPosScreenX() - 13, m_players[i].getCenterPosScreenY() - 13, 25, 25);
     }
 
     m_paint.end();
@@ -131,9 +131,9 @@ bool Field::checkingOutside(QPair<double, double> point)
 
 bool Field::checkingIntersectionWithPlayers(QPair<double, double> point, int idxPlayer)
 {
-    for(int j = 0; j < m_players[idxPlayer].dekartDotsPlayer.size(); j++){
-        if(fabs(point.first - m_players[idxPlayer].dekartDotsPlayer[j].first) +
-           fabs(point.second - m_players[idxPlayer].dekartDotsPlayer[j].second) < KILL_EPS){
+    for(int j = 0; j < m_players[idxPlayer].getSizeDekartDots(); j++){
+        if(fabs(point.first - m_players[idxPlayer].getDekardDotsPlayer(j).first) +
+           fabs(point.second - m_players[idxPlayer].getDekardDotsPlayer(j).second) < KILL_EPS){
             return true;
         }
     }
@@ -192,8 +192,8 @@ void Field::initCenterPosForPlayers()
 void Field::initDotsForPlayers()
 {
     for(int i = 0; i < m_players.size(); i++){
-        double x0 = m_players[i].centerPosDekartX;
-        double y0 = m_players[i].centerPosDekartY;
+        double x0 = m_players[i].getCenterPosDekartX();
+        double y0 = m_players[i].getCenterPosDekartY();
         double r = m_players[i].M_RADIUS;
         double w = r;
         double h = 0;
@@ -220,14 +220,14 @@ void Field::initDotsForPlayers()
             tmpX4 = x0 - w;
             tmpY4 = y0 + h;
 
-            m_players[i].dekartDotsPlayer.push_back(QPair<double, double>(tmpX1, tmpY1));
-            m_players[i].dekartDotsPlayer.push_back(QPair<double, double>(tmpX2, tmpY2));
-            m_players[i].dekartDotsPlayer.push_back(QPair<double, double>(tmpX3, tmpY3));
-            m_players[i].dekartDotsPlayer.push_back(QPair<double, double>(tmpX4, tmpY4));
-            m_players[i].screenDotsPlayer.push_back(QPoint(convertX_Axes(tmpX1), convertY_Axes(tmpY1)));
-            m_players[i].screenDotsPlayer.push_back(QPoint(convertX_Axes(tmpX2), convertY_Axes(tmpY2)));
-            m_players[i].screenDotsPlayer.push_back(QPoint(convertX_Axes(tmpX3), convertY_Axes(tmpY3)));
-            m_players[i].screenDotsPlayer.push_back(QPoint(convertX_Axes(tmpX4), convertY_Axes(tmpY4)));
+            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX1, tmpY1));
+            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX2, tmpY2));
+            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX3, tmpY3));
+            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX4, tmpY4));
+            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX1), convertY_Axes(tmpY1)));
+            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX2), convertY_Axes(tmpY2)));
+            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX3), convertY_Axes(tmpY3)));
+            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX4), convertY_Axes(tmpY4)));
             w -= Player::K_POLYGON;
         }
     }

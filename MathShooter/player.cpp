@@ -24,3 +24,53 @@ void Player::setCenterPosScreenY(int newPosCenterY)
 {
     centerPosScreenY = newPosCenterY;
 }
+
+int Player::getCenterPosDekartX()
+{
+    return centerPosDekartX;
+}
+
+int Player::getCenterPosDekartY()
+{
+    return centerPosDekartY;
+}
+
+int Player::getCenterPosScreenX()
+{
+    return centerPosScreenX;
+}
+
+int Player::getCenterPosScreenY()
+{
+    return centerPosScreenY;
+}
+
+int Player::getSizeDekartDots()
+{
+    return dekartDotsPlayer.size();
+}
+
+int Player::getSizeScreenDots()
+{
+    return screenDotsPlayer.size();
+}
+
+QPair<double, double> Player::getDekardDotsPlayer(int idx)
+{
+    return dekartDotsPlayer[idx];
+}
+
+QPoint Player::getScreenDotsPlayer(int idx)
+{
+    return screenDotsPlayer[idx];
+}
+
+void Player::pushBackInDekartDotsPlayer(QPair<double, double> point)
+{
+    dekartDotsPlayer.push_back(point);
+}
+
+void Player::pushBackInScreenDotsPlayer(QPoint point)
+{
+    screenDotsPlayer.push_back(point);
+}
