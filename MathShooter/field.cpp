@@ -11,10 +11,6 @@ Field::Field(QWidget* parent) : QFrame(parent)
 
 void Field::timerEvent(QTimerEvent *)
 {
-    tempLineDots.push_back(m_dots[idxPoint++]);
-//    if(idxPoint == m_dots.size()){
-//        endDrawingGraph();
-//    }
     this->repaint();
 }
 
@@ -33,10 +29,17 @@ void Field::resizeEvent(QResizeEvent* event)
 
 void Field::doDrawing()
 {
-    dekartSystemDrawing();
+    { // отрисовка координатных осей
+        dekartSystemDrawing();
+    }
+
+    { // отрисовка игроков на поле
+        playersDrawing();
+    }
 
     { // отрисовка графика функции
-        if(!endLength() && idxPoint >= 1 && !checkingOutside(tempLineDots[idxPoint - 1])){
+        tempLineDotsGraph.push_back(m_dots[idxPoint++]);
+        if(!endLength() && idxPoint >= 1 && !checkingOutside(tempLineDotsGraph[idxPoint - 1])){
             graphDrawing();
         }
         else{
@@ -48,34 +51,47 @@ void Field::doDrawing()
 void Field::graphDrawing()
 {
 
-    paint.begin(this);
+    m_paint.begin(this);
 
-    paint.setBrush(Qt::black);
-    paint.setPen(Qt::black);
+    m_paint.setBrush(Qt::black);
+    m_paint.setPen(Qt::black);
 
-    for(const auto& i : tempLineDots){
-        paint.drawEllipse(i, 1, 1);
+    for(const auto& i : tempLineDotsGraph){
+        m_paint.drawEllipse(i, 1, 1);
     }
 
-    paint.end();
+    m_paint.end();
+}
+
+void Field::playersDrawing()
+{
+    m_paint.begin(this);
+
+    m_paint.setBrush(Qt::black);
+    m_paint.setPen(Qt::black);
+
+    for(int i = 0; i < m_players.size(); i++){
+        m_paint.drawEllipse(m_players[i].centerPosScreenX, m_players[i].centerPosScreenY, 25, 25);
+    }
+    m_paint.end();
 }
 
 void Field::dekartSystemDrawing()
 {
-    paint.begin(this);
+    m_paint.begin(this);
 
-    paint.setPen(Qt::black);
+    m_paint.setPen(Qt::black);
 
-    paint.drawLine(0, this->height() / 2, this->width(), this->height() / 2);
-    paint.drawLine(this->width() / 2, 0, this->width() / 2, this->height());
+    m_paint.drawLine(0, this->height() / 2, this->width(), this->height() / 2);
+    m_paint.drawLine(this->width() / 2, 0, this->width() / 2, this->height());
 
-    paint.end();
+    m_paint.end();
 }
 
 void Field::convertToScreenSystem()
 {
     m_dots.clear();
-    for(const auto& i : dekartDots){
+    for(const auto& i : dekartDotsGraph){
         m_dots.push_back(QPoint(convertX_Axes(i.first), convertY_Axes(i.second)));
     }
 }
@@ -95,7 +111,7 @@ int Field::convertY_Axes(double m_y)
 void Field::updateDistFactor()
 {
     distFactorForX = width() / X_LENGTH;
-    distFactorForY = height() / X_LENGTH;
+    distFactorForY = height() / Y_LENGTH;
 }
 
 bool Field::checkingOutside(QPoint point)
@@ -114,16 +130,47 @@ bool Field::endLength()
 void Field::endDrawingGraph()
 {
     killTimer(timerId);
-    tempLineDots.clear();
+    tempLineDotsGraph.clear();
+}
+
+void Field::initPlayers()
+{
+    QTime zerno(0, 0, 0);
+    QRandomGenerator generator(zerno.secsTo(QTime::currentTime()));
+
+    int signX = -1;
+    int signY = 1;
+
+    for(int i = 0; i < m_players.size(); i++){
+        int posDecartX = generator.generate() % (int)(X_LENGTH / 2 - 1) * signX;
+        int posDecartY = generator.generate() % (int)(Y_LENGTH / 2 - 1) * signY;
+
+        m_players[i].setCenterPosDekartX(posDecartX);
+        m_players[i].setCenterPosDekartY(posDecartY);
+        m_players[i].setCenterPosScreenX(convertX_Axes(posDecartX));
+        m_players[i].setCenterPosScreenY(convertY_Axes(posDecartY));
+
+        signX *= (-1);
+        if((i + 1) % 2 == 0){ signY *= (-1); }
+    }
+
+
+}
+
+void Field::updateCountPlayers(int countPlayers)
+{
+    m_players.resize(countPlayers);
+
+    initPlayers();
 }
 
 void Field::updateCoordGraph(const QVector<QPair<double, double>>& m_dots)
 {
     int idx = 0;
-    this->dekartDots.clear();
-    this->dekartDots.resize(m_dots.size());
+    this->dekartDotsGraph.clear();
+    this->dekartDotsGraph.resize(m_dots.size());
     for(const auto& i : m_dots){
-        this->dekartDots[idx++] = i;
+        this->dekartDotsGraph[idx++] = i;
     }
     convertToScreenSystem();
 }

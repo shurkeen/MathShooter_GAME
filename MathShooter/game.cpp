@@ -44,14 +44,20 @@ Game::Game(QWidget* parent) : QWidget(parent)
         connect(this, &Game::coordUpdated, this->m_field, [this]{this->m_field->updateCoordGraph(this->m_dots);});
     }
 
+    { // связь изменений количества игроков между классами Game и Fiedl
+        connect(this, &Game::countPlayersUpdated, this->m_field, [this]{this->m_field->updateCountPlayers(this->numberOfPlayers);});
+    }
+
     setWindowTitle("MathShooter");
 }
 
 void Game::initGame()
 {
     gettingCoord();
+    gettingCountPlayers();
+
     m_field->updateField();
-    // цикл перехода хода игроков
+    // добавить цикл перехода хода игроков
 }
 
 void Game::gettingCoord()
@@ -65,5 +71,15 @@ void Game::gettingCoord()
         m_dots[i].second = 1.0;
         h += 0.05;
     }
+    for(int i = 0; i < 200; i++){
+        m_dots.push_back(QPair<double, double>(-25 + h, 3.0));
+        h += 0.05;
+    }
     emit this->coordUpdated();
+}
+
+void Game::gettingCountPlayers()
+{
+    numberOfPlayers = 4;
+    emit this->countPlayersUpdated();
 }

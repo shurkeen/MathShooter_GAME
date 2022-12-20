@@ -17,9 +17,11 @@ public:
     Game(QWidget* parent = 0);
     void initGame();
     void gettingCoord();
+    void gettingCountPlayers();
 
 signals:
     void coordUpdated();
+    void countPlayersUpdated();
 
 private:
     Field* m_field;
@@ -28,6 +30,7 @@ private:
     QLineEdit* functionInput;
     QLabel* historyInput;
     QVector<QPair<double, double> > m_dots;
+    int numberOfPlayers;
 };
 
 #endif // GAME_H

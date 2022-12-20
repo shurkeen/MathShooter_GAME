@@ -5,6 +5,9 @@
 #include <QPainter>
 #include <QSignalMapper>
 #include <QPair>
+#include <QRandomGenerator>
+#include <QTime>
+#include "player.h"
 
 class Field : public QFrame
 {
@@ -16,6 +19,7 @@ public:
 
 public slots:
     void updateCoordGraph(const QVector<QPair<double, double>>& m_dots);
+    void updateCountPlayers(int countPlayers);
 
 protected:
     void timerEvent(QTimerEvent*) override;
@@ -34,6 +38,7 @@ private:
 
     void doDrawing();
     void graphDrawing();
+    void playersDrawing();
     void dekartSystemDrawing();
     void convertToScreenSystem();
     int convertX_Axes(double);
@@ -42,12 +47,14 @@ private:
     bool checkingOutside(QPoint point);
     bool endLength();
     void endDrawingGraph();
+    void initPlayers();
 
     QVector<QPoint> m_dots;
-    QVector<QPoint> tempLineDots;
-    QVector<QPair<double, double>> dekartDots;
+    QVector<QPoint> tempLineDotsGraph;
+    QVector<QPair<double, double>> dekartDotsGraph;
     QFrame* fieldFrame;
-    QPainter paint;
+    QPainter m_paint;
+    QVector<Player> m_players;
 };
 
 #endif // FIELD_H

@@ -1,6 +1,6 @@
 #include <QApplication>
-#include "game.h"
 #include <QHBoxLayout>
+#include "game.h"
 
 int main(int argc, char *argv[])
 {

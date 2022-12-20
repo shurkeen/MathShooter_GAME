@@ -54,11 +54,13 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
-		../MathShooter/main.cpp moc_field.cpp \
+		../MathShooter/main.cpp \
+		../MathShooter/player.cpp moc_field.cpp \
 		moc_game.cpp
 OBJECTS       = field.o \
 		game.o \
 		main.o \
+		player.o \
 		moc_field.o \
 		moc_game.o
 DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.prf \
@@ -342,9 +344,11 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/yacc.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/lex.prf \
 		../MathShooter/MathShooter.pro ../MathShooter/field.h \
-		../MathShooter/game.h ../MathShooter/field.cpp \
+		../MathShooter/game.h \
+		../MathShooter/player.h ../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
-		../MathShooter/main.cpp
+		../MathShooter/main.cpp \
+		../MathShooter/player.cpp
 QMAKE_TARGET  = MathShooter
 DESTDIR       = 
 TARGET        = MathShooter.app/Contents/MacOS/MathShooter
@@ -967,8 +971,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h ../MathShooter/player.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/main.cpp ../MathShooter/player.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1096,6 +1100,8 @@ game.o: ../MathShooter/game.cpp ../MathShooter/game.h \
 
 main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QApplication \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qapplication.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QHBoxLayout \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qboxlayout.h \
 		../MathShooter/game.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QWidget \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qwidget.h \
@@ -1115,10 +1121,11 @@ main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidge
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QHBoxLayout \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qboxlayout.h
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MathShooter/main.cpp
+
+player.o: ../MathShooter/player.cpp ../MathShooter/player.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o player.o ../MathShooter/player.cpp
 
 moc_field.o: moc_field.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_field.o moc_field.cpp
