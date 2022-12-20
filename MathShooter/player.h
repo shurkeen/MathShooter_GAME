@@ -15,7 +15,8 @@ public:
     void setCenterPosScreenY(int);
 
 //private:
-    static const int m_radius = 20;
+    constexpr static const double M_RADIUS = 1;
+    constexpr static const double K_POLYGON = 0.005;
     int centerPosDekartX;
     int centerPosDekartY;
     int centerPosScreenX;

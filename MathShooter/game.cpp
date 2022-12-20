@@ -63,17 +63,17 @@ void Game::initGame()
 void Game::gettingCoord()
 {
     m_dots.clear();
-    int sz = 500;
+    int sz = 833;
     m_dots.resize(sz);
-    double h = 0.05;
+    double h = 0.03;
     for(int i = 0; i < sz; i++){
         m_dots[i].first = -25.0 + h;
         m_dots[i].second = 1.0;
-        h += 0.05;
+        h += 0.03;
     }
-    for(int i = 0; i < 200; i++){
+    for(int i = 0; i < 800; i++){
         m_dots.push_back(QPair<double, double>(-25 + h, 3.0));
-        h += 0.05;
+        h += 0.03;
     }
     emit this->coordUpdated();
 }

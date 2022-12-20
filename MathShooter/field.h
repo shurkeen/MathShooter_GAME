@@ -27,7 +27,7 @@ protected:
     void resizeEvent(QResizeEvent*) override;
 
 private:
-    static const int DELAY = 5;
+    static const int DELAY = 1;
     constexpr static const double X_LENGTH = 50.0;
     constexpr static const double Y_LENGTH = 30.0;
     double distFactorForX;
@@ -44,14 +44,17 @@ private:
     int convertX_Axes(double);
     int convertY_Axes(double);
     void updateDistFactor();
-    bool checkingOutside(QPoint point);
+    bool checkingOutside(QPair<double, double> point);
+    bool checkingIntersectionWithPlayers(QPair<double, double> point);
     bool endLength();
     void endDrawingGraph();
     void initPlayers();
+    void initCenterPosForPlayers();
+    void initDotsForPlayers();
 
-    QVector<QPoint> m_dots;
-    QVector<QPoint> tempLineDotsGraph;
-    QVector<QPair<double, double>> dekartDotsGraph;
+    QVector<QPoint> screenDotsGraph;
+    QVector<QPoint> tempScreenDotsGraph;
+    QVector<QPair<double, double> > dekartDotsGraph;
     QFrame* fieldFrame;
     QPainter m_paint;
     QVector<Player> m_players;
