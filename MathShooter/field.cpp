@@ -7,6 +7,9 @@ Field::Field(QWidget* parent) : QFrame(parent)
     fieldFrame->setFrameStyle(QFrame::Box);
 
     updateDistFactor();
+
+    inPaintingGraph = 0;
+    idxPlayer = 0;
 }
 
 void Field::timerEvent(QTimerEvent *)
@@ -38,13 +41,16 @@ void Field::doDrawing()
     }
 
     { // отрисовка графика функции
-        tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint++]);
-        attemptToKill(dekartDotsGraph[idxPoint]);
-        if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1])){
-            graphDrawing();
-        }
-        else{
-            if(idxPoint != 0) endDrawingGraph();
+        if(inPaintingGraph == 1){
+            qDebug() << idxPoint;
+            attemptToKill(dekartDotsGraph[idxPoint]);
+            tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint++]);
+            if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1])){
+                graphDrawing();
+            }
+            else{
+                if(idxPoint != 0) endDrawingGraph();
+            }
         }
     }
 }
@@ -143,7 +149,7 @@ bool Field::checkingIntersectionWithPlayers(QPair<double, double> point, int idx
 void Field::attemptToKill(QPair<double, double> point)
 {
     for(int i = 0; i < m_players.size(); i++){
-        if(checkingIntersectionWithPlayers(point, i)){
+        if(i != idxPlayer && checkingIntersectionWithPlayers(point, i)){
             auto it = m_players.begin() + i;
             m_players.erase(it);
         }
@@ -158,6 +164,7 @@ bool Field::endLength()
 void Field::endDrawingGraph()
 {
     killTimer(timerId);
+    inPaintingGraph = 0;
     tempScreenDotsGraph.clear();
 }
 
@@ -176,8 +183,9 @@ void Field::initCenterPosForPlayers()
     int signY = 1;
 
     for(int i = 0; i < m_players.size(); i++){
-        int posDecartX = generator.generate() % (int)(X_LENGTH / 2 - 1) * signX;
-        int posDecartY = generator.generate() % (int)(Y_LENGTH / 2 - 1) * signY;
+
+        int posDecartX = (generator.generate() % (int)(X_LENGTH / 2 - distanceBetweenPlayerAndAxisX) + distanceBetweenPlayerAndAxisX) * signX;
+        int posDecartY = (generator.generate() % (int)(Y_LENGTH / 2 - distanceBetweenPlayerAndAxisY) + distanceBetweenPlayerAndAxisY) * signY;
 
         m_players[i].setCenterPosDekartX(posDecartX);
         m_players[i].setCenterPosDekartY(posDecartY);
@@ -233,6 +241,31 @@ void Field::initDotsForPlayers()
     }
 }
 
+double Field::differenceBetweenY0andYi(const QVector<QPair<double, double>>& m_dots)
+{
+    for(int i = 0; i < m_dots.size(); i++){
+        if(fabs(m_dots[i].first - m_players[idxPlayer].getCenterPosDekartX()) < DIFF_EPS){
+            return m_players[idxPlayer].getCenterPosDekartY() - m_dots[i].second;
+        }
+    }
+    return 0.0;
+}
+
+void Field::movePlayer()
+{
+    updateField();
+}
+
+void Field::setNextPlayer()
+{
+    idxPlayer++;
+}
+
+int Field::getNumberOfPlayers()
+{
+    return m_players.size();
+}
+
 void Field::updateCountPlayers(int countPlayers)
 {
     m_players.resize(countPlayers);
@@ -242,17 +275,36 @@ void Field::updateCountPlayers(int countPlayers)
 
 void Field::updateCoordGraph(const QVector<QPair<double, double>>& m_dots)
 {
-    int idx = 0;
     this->dekartDotsGraph.clear();
-    this->dekartDotsGraph.resize(m_dots.size());
+    double tmpDekartAxisX = 0;
+    double tmpDekartAxisY = 0;
+    double diff = differenceBetweenY0andYi(m_dots);
     for(const auto& i : m_dots){
-        this->dekartDotsGraph[idx++] = i;
+        tmpDekartAxisX = i.first;
+        tmpDekartAxisY = i.second + diff;
+        if((m_players[idxPlayer].getCoordinateQuarter() == 2 || m_players[idxPlayer].getCoordinateQuarter() == 3)
+                && tmpDekartAxisX < m_players[idxPlayer].getCenterPosDekartX() - Player::M_RADIUS){
+            this->dekartDotsGraph.push_back(QPair<double, double>(tmpDekartAxisX, tmpDekartAxisY));
+        }
+        if((m_players[idxPlayer].getCoordinateQuarter() == 1 || m_players[idxPlayer].getCoordinateQuarter() == 4)
+                && tmpDekartAxisX > m_players[idxPlayer].getCenterPosDekartX() + Player::M_RADIUS){
+            this->dekartDotsGraph.push_back(QPair<double, double>(tmpDekartAxisX, tmpDekartAxisY));
+        }
+    }
+
+    if(m_players[idxPlayer].getCoordinateQuarter() == 2 || m_players[idxPlayer].getCoordinateQuarter() == 3){
+        for(int i = 0; i < this->dekartDotsGraph.size() / 2; i++){
+            swap(this->dekartDotsGraph[i], this->dekartDotsGraph[this->dekartDotsGraph.size() - 1 - i]);
+        }
     }
     convertToScreenSystem();
 }
 
 void Field::updateField()
 {
-    idxPoint = 0;
-    timerId = startTimer(DELAY);
+    if(inPaintingGraph != 1){
+        idxPoint = 0;
+        inPaintingGraph = 1;
+        timerId = startTimer(DELAY);
+    }
 }

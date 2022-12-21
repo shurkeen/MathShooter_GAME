@@ -7,7 +7,9 @@
 #include <QPair>
 #include <QRandomGenerator>
 #include <QTime>
+#include <QDebug>
 #include "player.h"
+#include "obstacle.h"
 
 class Field : public QFrame
 {
@@ -15,7 +17,9 @@ class Field : public QFrame
 
 public:
     Field(QWidget* parent = 0);
-    void updateField();
+    int getNumberOfPlayers();
+    void movePlayer();
+        void setNextPlayer();
 
 public slots:
     void updateCoordGraph(const QVector<QPair<double, double>>& m_dots);
@@ -28,7 +32,10 @@ protected:
 
 private:
     static const int DELAY = 1;
+    static const int distanceBetweenPlayerAndAxisX = 3;
+    static const int distanceBetweenPlayerAndAxisY = 3;
     constexpr static const double KILL_EPS = 2e-3;
+    constexpr static const double DIFF_EPS = 1e-6;
     constexpr static const double X_LENGTH = 50.0;
     constexpr static const double Y_LENGTH = 30.0;
     double distFactorForX;
@@ -36,6 +43,8 @@ private:
 
     int timerId;
     int idxPoint;
+    int idxPlayer;
+    int inPaintingGraph;
 
     void doDrawing();
     void graphDrawing();
@@ -53,6 +62,8 @@ private:
     void initPlayers();
     void initCenterPosForPlayers();
     void initDotsForPlayers();
+    double differenceBetweenY0andYi(const QVector<QPair<double, double>>& );
+    void updateField();
 
     QVector<QPoint> screenDotsGraph;
     QVector<QPoint> tempScreenDotsGraph;

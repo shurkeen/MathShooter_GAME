@@ -48,16 +48,17 @@ Game::Game(QWidget* parent) : QWidget(parent)
         connect(this, &Game::countPlayersUpdated, this->m_field, [this]{this->m_field->updateCountPlayers(this->numberOfPlayers);});
     }
 
+    { // связь кнопки "push" и обновлением поля игры
+        connect(fireBtn, &QPushButton::clicked, this->m_field, &Field::movePlayer);
+    }
+
     setWindowTitle("MathShooter");
 }
 
 void Game::initGame()
 {
-    gettingCoord();
     gettingCountPlayers();
-
-    m_field->updateField();
-    // добавить цикл перехода хода игроков
+    gettingCoord();
 }
 
 void Game::gettingCoord()

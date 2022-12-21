@@ -19,6 +19,7 @@ public:
     int getCenterPosScreenY();
     int getSizeDekartDots();
     int getSizeScreenDots();
+    int getCoordinateQuarter();
     QPair<double, double> getDekardDotsPlayer(int);
     QPoint getScreenDotsPlayer(int);
     void pushBackInDekartDotsPlayer(QPair<double, double>);

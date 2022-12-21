@@ -8,11 +8,13 @@ SOURCES += \
     field.cpp \
     game.cpp \
     main.cpp \
+    obstacle.cpp \
     player.cpp
 
 HEADERS += \
     field.h \
     game.h \
+    obstacle.h \
     player.h
 
 # Default rules for deployment.

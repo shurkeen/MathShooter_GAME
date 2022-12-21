@@ -55,11 +55,13 @@ OBJECTS_DIR   = ./
 SOURCES       = ../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
 		../MathShooter/main.cpp \
+		../MathShooter/obstacle.cpp \
 		../MathShooter/player.cpp moc_field.cpp \
 		moc_game.cpp
 OBJECTS       = field.o \
 		game.o \
 		main.o \
+		obstacle.o \
 		player.o \
 		moc_field.o \
 		moc_game.o
@@ -345,9 +347,11 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/lex.prf \
 		../MathShooter/MathShooter.pro ../MathShooter/field.h \
 		../MathShooter/game.h \
+		../MathShooter/obstacle.h \
 		../MathShooter/player.h ../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
 		../MathShooter/main.cpp \
+		../MathShooter/obstacle.cpp \
 		../MathShooter/player.cpp
 QMAKE_TARGET  = MathShooter
 DESTDIR       = 
@@ -971,8 +975,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h ../MathShooter/player.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/main.cpp ../MathShooter/player.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h ../MathShooter/obstacle.h ../MathShooter/player.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/main.cpp ../MathShooter/obstacle.cpp ../MathShooter/player.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1017,11 +1021,14 @@ moc_field.cpp: ../MathShooter/field.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qrandom.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QTime \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdatetime.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
 		../MathShooter/player.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
+		../MathShooter/obstacle.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
 	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/field.h -o moc_field.cpp
 
@@ -1049,11 +1056,14 @@ moc_game.cpp: ../MathShooter/game.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qrandom.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QTime \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdatetime.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
 		../MathShooter/player.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
+		../MathShooter/obstacle.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
 	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/game.h -o moc_game.cpp
 
@@ -1088,11 +1098,14 @@ field.o: ../MathShooter/field.cpp ../MathShooter/field.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qrandom.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QTime \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdatetime.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
 		../MathShooter/player.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
+		../MathShooter/obstacle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o field.o ../MathShooter/field.cpp
 
 game.o: ../MathShooter/game.cpp ../MathShooter/game.h \
@@ -1119,13 +1132,14 @@ game.o: ../MathShooter/game.cpp ../MathShooter/game.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qrandom.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QTime \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdatetime.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
 		../MathShooter/player.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
+		../MathShooter/obstacle.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QLayout \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qlayout.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QDialog \
@@ -1160,12 +1174,18 @@ main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidge
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qrandom.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QTime \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdatetime.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
 		../MathShooter/player.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
+		../MathShooter/obstacle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MathShooter/main.cpp
+
+obstacle.o: ../MathShooter/obstacle.cpp ../MathShooter/obstacle.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obstacle.o ../MathShooter/obstacle.cpp
 
 player.o: ../MathShooter/player.cpp ../MathShooter/player.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \

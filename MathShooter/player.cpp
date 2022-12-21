@@ -55,6 +55,20 @@ int Player::getSizeScreenDots()
     return screenDotsPlayer.size();
 }
 
+int Player::getCoordinateQuarter()
+{
+    if(centerPosDekartX < 0 && centerPosDekartY >= 0){
+        return 1;
+    }
+    else if(centerPosDekartX > 0 && centerPosDekartY >= 0){
+        return 2;
+    }
+    else if(centerPosDekartX > 0 && centerPosDekartY < 0){
+        return 3;
+    }
+    return 4;
+}
+
 QPair<double, double> Player::getDekardDotsPlayer(int idx)
 {
     return dekartDotsPlayer[idx];
