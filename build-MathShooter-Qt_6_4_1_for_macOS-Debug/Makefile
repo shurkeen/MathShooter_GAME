@@ -1184,7 +1184,13 @@ main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidge
 		../MathShooter/obstacle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MathShooter/main.cpp
 
-obstacle.o: ../MathShooter/obstacle.cpp ../MathShooter/obstacle.h
+obstacle.o: ../MathShooter/obstacle.cpp ../MathShooter/obstacle.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o obstacle.o ../MathShooter/obstacle.cpp
 
 player.o: ../MathShooter/player.cpp ../MathShooter/player.h \
