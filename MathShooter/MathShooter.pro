@@ -7,13 +7,23 @@ CONFIG += c++17
 SOURCES += \
     field.cpp \
     game.cpp \
+    graph.cpp \
     main.cpp \
+    mathcalculator.cpp \
+    mathchecker.cpp \
+    mathexpression.cpp \
+    mathparser.cpp \
     obstacle.cpp \
     player.cpp
 
 HEADERS += \
     field.h \
     game.h \
+    graph.h \
+    mathcalculator.h \
+    mathchecker.h \
+    mathexpression.h \
+    mathparser.h \
     obstacle.h \
     player.h
 

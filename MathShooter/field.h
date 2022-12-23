@@ -22,6 +22,9 @@ public:
     void movePlayer();
         void setNextPlayer();
 
+    constexpr static const double X_LENGTH = 50.0;
+    constexpr static const double Y_LENGTH = 30.0;
+
 public slots:
     void updateCoordGraph(const QVector<QPair<double, double>>& m_dots);
     void updateCountPlayers(int countPlayers);
@@ -35,11 +38,9 @@ private:
     static const int DELAY = 1;
     static const int distanceBetweenPlayerAndAxisX = 7;
     static const int distanceBetweenPlayerAndAxisY = 3;
-    constexpr static const double KILL_EPS = 2e-3;
-    constexpr static const double INTERSECTION_EPS = 5e-2;
+    constexpr static const double KILL_EPS = 2e-1;
+    constexpr static const double INTERSECTION_EPS = 5e-1;
     constexpr static const double DIFF_EPS = 1e-6;
-    constexpr static const double X_LENGTH = 50.0;
-    constexpr static const double Y_LENGTH = 30.0;
     double distFactorForX;
     double distFactorForY;
 

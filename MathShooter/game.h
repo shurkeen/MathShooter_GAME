@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QObject>
 #include "field.h"
+#include "graph.h"
 
 class Game : public QWidget
 {
@@ -16,12 +17,15 @@ class Game : public QWidget
 public:
     Game(QWidget* parent = 0);
     void initGame();
-    void gettingCoord();
     void gettingCountPlayers();
+
+public slots:
+    void gettingCoord();
 
 signals:
     void coordUpdated();
     void countPlayersUpdated();
+    void gotTheCoordinates();
 
 private:
     Field* m_field;

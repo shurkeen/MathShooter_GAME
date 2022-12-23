@@ -54,13 +54,23 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
+		../MathShooter/graph.cpp \
 		../MathShooter/main.cpp \
+		../MathShooter/mathcalculator.cpp \
+		../MathShooter/mathchecker.cpp \
+		../MathShooter/mathexpression.cpp \
+		../MathShooter/mathparser.cpp \
 		../MathShooter/obstacle.cpp \
 		../MathShooter/player.cpp moc_field.cpp \
 		moc_game.cpp
 OBJECTS       = field.o \
 		game.o \
+		graph.o \
 		main.o \
+		mathcalculator.o \
+		mathchecker.o \
+		mathexpression.o \
+		mathparser.o \
 		obstacle.o \
 		player.o \
 		moc_field.o \
@@ -350,10 +360,20 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/lex.prf \
 		../MathShooter/MathShooter.pro ../MathShooter/field.h \
 		../MathShooter/game.h \
+		../MathShooter/graph.h \
+		../MathShooter/mathcalculator.h \
+		../MathShooter/mathchecker.h \
+		../MathShooter/mathexpression.h \
+		../MathShooter/mathparser.h \
 		../MathShooter/obstacle.h \
 		../MathShooter/player.h ../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
+		../MathShooter/graph.cpp \
 		../MathShooter/main.cpp \
+		../MathShooter/mathcalculator.cpp \
+		../MathShooter/mathchecker.cpp \
+		../MathShooter/mathexpression.cpp \
+		../MathShooter/mathparser.cpp \
 		../MathShooter/obstacle.cpp \
 		../MathShooter/player.cpp
 QMAKE_TARGET  = MathShooter
@@ -987,8 +1007,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h ../MathShooter/obstacle.h ../MathShooter/player.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/main.cpp ../MathShooter/obstacle.cpp ../MathShooter/player.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h ../MathShooter/graph.h ../MathShooter/mathcalculator.h ../MathShooter/mathchecker.h ../MathShooter/mathexpression.h ../MathShooter/mathparser.h ../MathShooter/obstacle.h ../MathShooter/player.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/graph.cpp ../MathShooter/main.cpp ../MathShooter/mathcalculator.cpp ../MathShooter/mathchecker.cpp ../MathShooter/mathexpression.cpp ../MathShooter/mathparser.cpp ../MathShooter/obstacle.cpp ../MathShooter/player.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1158,6 +1178,13 @@ game.o: ../MathShooter/game.cpp ../MathShooter/game.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qdialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o game.o ../MathShooter/game.cpp
 
+graph.o: ../MathShooter/graph.cpp ../MathShooter/graph.h \
+		../MathShooter/mathcalculator.h \
+		../MathShooter/mathexpression.h \
+		../MathShooter/mathchecker.h \
+		../MathShooter/mathparser.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o graph.o ../MathShooter/graph.cpp
+
 main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QApplication \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qapplication.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QHBoxLayout \
@@ -1195,6 +1222,23 @@ main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidge
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
 		../MathShooter/obstacle.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MathShooter/main.cpp
+
+mathcalculator.o: ../MathShooter/mathcalculator.cpp ../MathShooter/mathcalculator.h \
+		../MathShooter/mathexpression.h \
+		../MathShooter/mathchecker.h \
+		../MathShooter/mathparser.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathcalculator.o ../MathShooter/mathcalculator.cpp
+
+mathchecker.o: ../MathShooter/mathchecker.cpp ../MathShooter/mathchecker.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathchecker.o ../MathShooter/mathchecker.cpp
+
+mathexpression.o: ../MathShooter/mathexpression.cpp ../MathShooter/mathexpression.h \
+		../MathShooter/mathchecker.h \
+		../MathShooter/mathparser.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathexpression.o ../MathShooter/mathexpression.cpp
+
+mathparser.o: ../MathShooter/mathparser.cpp ../MathShooter/mathparser.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathparser.o ../MathShooter/mathparser.cpp
 
 obstacle.o: ../MathShooter/obstacle.cpp ../MathShooter/obstacle.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \

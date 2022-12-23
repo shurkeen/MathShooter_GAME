@@ -48,9 +48,14 @@ void Field::doDrawing()
         if(inPaintingGraph == 1){
             //qDebug() << idxPoint;
             attemptToKill(dekartDotsGraph[idxPoint]);
-            tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint++]);
-            if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1]) &&
-                    !checkingIntersectionGraphWithObstracles(dekartDotsGraph[idxPoint - 1])){
+            int koff = (int)(1.0 * idxPoint / dekartDotsGraph.size() * 100);
+            for(int i = 0; i < 60 + koff; i++){
+                if(idxPoint < screenDotsGraph.size()){
+                    tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint++]);
+                }
+            }
+            if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1])
+                    ){
                 graphDrawing();
             }
             else{
@@ -66,11 +71,16 @@ void Field::graphDrawing()
     m_paint.begin(this);
 
     m_paint.setBrush(Qt::black);
-    m_paint.setPen(Qt::black);
+    m_paint.setPen(QColorConstants::Svg::brown);
 
-    for(const auto& i : tempScreenDotsGraph){
-        m_paint.drawEllipse(i, 1, 1);
+    for(int i = 1; i < tempScreenDotsGraph.size(); i++){
+        m_paint.drawLine(tempScreenDotsGraph[i - 1].rx(), tempScreenDotsGraph[i - 1].ry(),
+                tempScreenDotsGraph[i].rx(), tempScreenDotsGraph[i].ry());
     }
+
+//    for(const auto& i : tempScreenDotsGraph){
+//        m_paint.drawEllipse(i, 1, 1);
+//    }
 
     m_paint.end();
 }
@@ -106,17 +116,17 @@ void Field::playersDrawing()
 {
     m_paint.begin(this);
 
-//    for(int i = 0; i < m_players.size(); i++){
-//        for(int j = 1; j < m_players[i].getSizeScreenDots(); j++){
-//            m_paint.drawLine(m_players[i].getScreenDotsPlayer(j - 1), m_players[i].getScreenDotsPlayer(j));
-//        }
-//    }
+    for(int i = 0; i < m_players.size(); i++){
+        for(int j = 1; j < m_players[i].getSizeScreenDots(); j++){
+            m_paint.drawLine(m_players[i].getScreenDotsPlayer(j - 1), m_players[i].getScreenDotsPlayer(j));
+        }
+    }
 
     m_paint.setPen(QPen(Qt::green,Qt::SolidLine));
     m_paint.setBrush(Qt::yellow);
 
     for(int i = 0; i < m_players.size(); i++){
-        m_paint.drawEllipse(m_players[i].getCenterPosScreenX() - 13, m_players[i].getCenterPosScreenY() - 13, 25, 25);
+        m_paint.drawEllipse(m_players[i].getCenterPosScreenX() - 15, m_players[i].getCenterPosScreenY() - 15, 30, 30);
     }
 
     m_paint.end();
@@ -207,9 +217,12 @@ bool Field::checkingIntersectionPlayersWithObstracle(double X0, double Y0, doubl
 void Field::attemptToKill(QPair<double, double> point)
 {
     for(int i = 0; i < m_players.size(); i++){
-        if(i != idxPlayer && checkingIntersectionGraphWithPlayers(point, i)){
-            auto it = m_players.begin() + i;
-            m_players.erase(it);
+        if(i != ((idxPlayer - 1 +  m_players.size()) %  m_players.size()) && checkingIntersectionGraphWithPlayers(point, i)){
+            for(int j = i; j < m_players.size() - 1; j++){
+                qSwap(m_players[j], m_players[j + 1]);
+            }
+            m_players.resize(m_players.size() - 1);
+            idxPlayer = idxPlayer % m_players.size();
         }
     }
 }
@@ -358,11 +371,12 @@ double Field::differenceBetweenY0andYi(const QVector<QPair<double, double>>& m_d
 void Field::movePlayer()
 {
     updateField();
+    setNextPlayer();
 }
 
 void Field::setNextPlayer()
 {
-    idxPlayer++;
+    idxPlayer = (idxPlayer + 1) % m_players.size();
 }
 
 int Field::getNumberOfPlayers()

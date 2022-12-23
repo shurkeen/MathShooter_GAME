@@ -48,8 +48,16 @@ Game::Game(QWidget* parent) : QWidget(parent)
         connect(this, &Game::countPlayersUpdated, this->m_field, [this]{this->m_field->updateCountPlayers(this->numberOfPlayers);});
     }
 
-    { // связь кнопки "push" и обновлением поля игры
-        connect(fireBtn, &QPushButton::clicked, this->m_field, &Field::movePlayer);
+    { // связь полученных координат графика функции и начала хода игрока
+        connect(this, &Game::gotTheCoordinates, this->m_field, &Field::movePlayer);
+    }
+
+    { // связь кнопки "push" c вычислением координат графика на поле
+        connect(fireBtn, &QPushButton::clicked, this, &Game::gettingCoord);
+    }
+
+    { // historyInput
+        connect(fireBtn, &QPushButton::clicked, this->historyInput, [this]{this->historyInput->setText(this->functionInput->text());});
     }
 
     setWindowTitle("MathShooter");
@@ -58,25 +66,28 @@ Game::Game(QWidget* parent) : QWidget(parent)
 void Game::initGame()
 {
     gettingCountPlayers();
-    gettingCoord();
+    // gettingCoord();
 }
 
 void Game::gettingCoord()
 {
+
+    Graph graph;
+    graph.Input(functionInput->text().toStdString());
+    graph.Evaluate(-Field::X_LENGTH / 2, Field::X_LENGTH / 2);
+
     m_dots.clear();
-    int sz = 500;
-    m_dots.resize(sz);
-    double h = 0.05;
-    for(int i = 0; i < sz; i++){
-        m_dots[i].first = -25.0 + h;
-        m_dots[i].second = 1.0;
-        h += 0.05;
+    for(int i = 0; i < graph.getNumberOfGraphPoints(); i++){
+        m_dots.push_back({graph.getDekartPosInGraphForX_Axis(i), graph.getDekartPosInGraphForY_Axis(i)});
     }
-    for(int i = 0; i < 800; i++){
-        m_dots.push_back(QPair<double, double>(-25 + h, 3.0));
-        h += 0.05;
-    }
+    //m_dots.push_back({1, 2});
+
+//    for(int i = 0; i < m_dots.size(); i++){
+//        qDebug() << m_dots[i];
+//    }
+
     emit this->coordUpdated();
+    emit this->gotTheCoordinates();
 }
 
 void Game::gettingCountPlayers()
