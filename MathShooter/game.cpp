@@ -82,10 +82,6 @@ void Game::gettingCoord()
     }
     //m_dots.push_back({1, 2});
 
-//    for(int i = 0; i < m_dots.size(); i++){
-//        qDebug() << m_dots[i];
-//    }
-
     emit this->coordUpdated();
     emit this->gotTheCoordinates();
 }

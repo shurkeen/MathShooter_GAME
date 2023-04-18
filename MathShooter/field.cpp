@@ -54,8 +54,8 @@ void Field::doDrawing()
                     tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint++]);
                 }
             }
-            if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1])
-                    ){
+            if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1]) &&
+                    !checkingIntersectionGraphWithObstracles(dekartDotsGraph[idxPoint - 1])){
                 graphDrawing();
             }
             else{
@@ -116,11 +116,11 @@ void Field::playersDrawing()
 {
     m_paint.begin(this);
 
-    for(int i = 0; i < m_players.size(); i++){
-        for(int j = 1; j < m_players[i].getSizeScreenDots(); j++){
-            m_paint.drawLine(m_players[i].getScreenDotsPlayer(j - 1), m_players[i].getScreenDotsPlayer(j));
-        }
-    }
+//    for(int i = 0; i < m_players.size(); i++){
+//        for(int j = 1; j < m_players[i].getSizeScreenDots(); j++){
+//            m_paint.drawLine(m_players[i].getScreenDotsPlayer(j - 1), m_players[i].getScreenDotsPlayer(j));
+//        }
+//    }
 
     m_paint.setPen(QPen(Qt::green,Qt::SolidLine));
     m_paint.setBrush(Qt::yellow);

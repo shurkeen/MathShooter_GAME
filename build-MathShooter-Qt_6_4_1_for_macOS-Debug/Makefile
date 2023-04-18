@@ -14,10 +14,10 @@ EQ            = =
 
 CC            = /Library/Developer/CommandLineTools/usr/bin/clang
 CXX           = /Library/Developer/CommandLineTools/usr/bin/clang++
-DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g $(EXPORT_ARCH_ARGS) -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mmacosx-version-min=10.14 -Wall -Wextra $(DEFINES)
 CXXFLAGS      = -pipe -stdlib=libc++ -g -std=gnu++1z $(EXPORT_ARCH_ARGS) -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mmacosx-version-min=10.14 -Wall -Wextra $(DEFINES)
-INCPATH       = -I../MathShooter -I. -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AGL.framework/Headers -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AGL.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib
+INCPATH       = -I../MathShooter -I. -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AGL.framework/Headers -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/AGL.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib
 QMAKE         = /Users/aleksandrdudin/Qt/6.4.1/macos/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = MathShooter1.0.0
 DISTDIR = /Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/build-MathShooter-Qt_6_4_1_for_macOS-Debug/.tmp/MathShooter1.0.0
 LINK          = /Library/Developer/CommandLineTools/usr/bin/clang++
 LFLAGS        = -stdlib=libc++ -headerpad_max_install_names $(EXPORT_ARCH_ARGS) -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -mmacosx-version-min=10.14 -Wl,-rpath,@executable_path/../Frameworks -Wl,-rpath,/Users/aleksandrdudin/Qt/6.4.1/macos/lib
-LIBS          = $(SUBLIBS) -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib -framework QtWidgets -framework QtGui -framework AppKit -framework ImageIO -framework Metal -framework QtCore -framework IOKit -framework DiskArbitration -framework AGL -framework OpenGL   
+LIBS          = $(SUBLIBS) -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib -framework QtWidgets -framework QtGui -framework AppKit -framework ImageIO -framework Metal -framework QtNetwork -framework QtCore -framework IOKit -framework DiskArbitration -framework AGL -framework OpenGL   
 AR            = /Library/Developer/CommandLineTools/usr/bin/ar cq
 RANLIB        = /Library/Developer/CommandLineTools/usr/bin/ranlib -s
 SED           = sed
@@ -52,7 +52,8 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../MathShooter/field.cpp \
+SOURCES       = ../MathShooter/client.cpp \
+		../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
 		../MathShooter/graph.cpp \
 		../MathShooter/main.cpp \
@@ -61,9 +62,13 @@ SOURCES       = ../MathShooter/field.cpp \
 		../MathShooter/mathexpression.cpp \
 		../MathShooter/mathparser.cpp \
 		../MathShooter/obstacle.cpp \
-		../MathShooter/player.cpp moc_field.cpp \
-		moc_game.cpp
-OBJECTS       = field.o \
+		../MathShooter/player.cpp \
+		../MathShooter/server.cpp moc_client.cpp \
+		moc_field.cpp \
+		moc_game.cpp \
+		moc_server.cpp
+OBJECTS       = client.o \
+		field.o \
 		game.o \
 		graph.o \
 		main.o \
@@ -73,8 +78,11 @@ OBJECTS       = field.o \
 		mathparser.o \
 		obstacle.o \
 		player.o \
+		server.o \
+		moc_client.o \
 		moc_field.o \
-		moc_game.o
+		moc_game.o \
+		moc_server.o
 DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/device_config.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/common/unix.conf \
@@ -355,7 +363,8 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/exceptions.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/yacc.prf \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/lex.prf \
-		../MathShooter/MathShooter.pro ../MathShooter/field.h \
+		../MathShooter/MathShooter.pro ../MathShooter/client.h \
+		../MathShooter/field.h \
 		../MathShooter/game.h \
 		../MathShooter/graph.h \
 		../MathShooter/mathcalculator.h \
@@ -363,7 +372,9 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		../MathShooter/mathexpression.h \
 		../MathShooter/mathparser.h \
 		../MathShooter/obstacle.h \
-		../MathShooter/player.h ../MathShooter/field.cpp \
+		../MathShooter/player.h \
+		../MathShooter/server.h ../MathShooter/client.cpp \
+		../MathShooter/field.cpp \
 		../MathShooter/game.cpp \
 		../MathShooter/graph.cpp \
 		../MathShooter/main.cpp \
@@ -372,7 +383,8 @@ DIST          = /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.p
 		../MathShooter/mathexpression.cpp \
 		../MathShooter/mathparser.cpp \
 		../MathShooter/obstacle.cpp \
-		../MathShooter/player.cpp
+		../MathShooter/player.cpp \
+		../MathShooter/server.cpp
 QMAKE_TARGET  = MathShooter
 DESTDIR       = 
 TARGET        = MathShooter.app/Contents/MacOS/MathShooter
@@ -680,6 +692,7 @@ Makefile: ../MathShooter/MathShooter.pro /Users/aleksandrdudin/Qt/6.4.1/macos/mk
 		../MathShooter/MathShooter.pro \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Resources/QtWidgets.prl \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Resources/QtGui.prl \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Resources/QtNetwork.prl \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Resources/QtCore.prl
 	$(QMAKE) -o Makefile ../MathShooter/MathShooter.pro -spec macx-clang CONFIG+=debug CONFIG+=qml_debug
 /Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/features/spec_pre.prf:
@@ -965,6 +978,7 @@ Makefile: ../MathShooter/MathShooter.pro /Users/aleksandrdudin/Qt/6.4.1/macos/mk
 ../MathShooter/MathShooter.pro:
 /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Resources/QtWidgets.prl:
 /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Resources/QtGui.prl:
+/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Resources/QtNetwork.prl:
 /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Resources/QtCore.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ../MathShooter/MathShooter.pro -spec macx-clang CONFIG+=debug CONFIG+=qml_debug
@@ -995,8 +1009,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.h ../MathShooter/game.h ../MathShooter/graph.h ../MathShooter/mathcalculator.h ../MathShooter/mathchecker.h ../MathShooter/mathexpression.h ../MathShooter/mathparser.h ../MathShooter/obstacle.h ../MathShooter/player.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/graph.cpp ../MathShooter/main.cpp ../MathShooter/mathcalculator.cpp ../MathShooter/mathchecker.cpp ../MathShooter/mathexpression.cpp ../MathShooter/mathparser.cpp ../MathShooter/obstacle.cpp ../MathShooter/player.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/client.h ../MathShooter/field.h ../MathShooter/game.h ../MathShooter/graph.h ../MathShooter/mathcalculator.h ../MathShooter/mathchecker.h ../MathShooter/mathexpression.h ../MathShooter/mathparser.h ../MathShooter/obstacle.h ../MathShooter/player.h ../MathShooter/server.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MathShooter/client.cpp ../MathShooter/field.cpp ../MathShooter/game.cpp ../MathShooter/graph.cpp ../MathShooter/main.cpp ../MathShooter/mathcalculator.cpp ../MathShooter/mathchecker.cpp ../MathShooter/mathexpression.cpp ../MathShooter/mathparser.cpp ../MathShooter/obstacle.cpp ../MathShooter/player.cpp ../MathShooter/server.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1025,9 +1039,52 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_field.cpp moc_game.cpp
+compiler_moc_header_make_all: moc_client.cpp moc_field.cpp moc_game.cpp moc_server.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_field.cpp moc_game.cpp
+	-$(DEL_FILE) moc_client.cpp moc_field.cpp moc_game.cpp moc_server.cpp
+moc_client.cpp: ../MathShooter/client.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../MathShooter/game.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QWidget \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qwidget.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QFrame \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qframe.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QLabel \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qlabel.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QLineEdit \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
+		../MathShooter/field.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/QPainter \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/qpainter.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QRandomGenerator \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qrandom.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QTime \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdatetime.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
+		../MathShooter/player.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
+		../MathShooter/obstacle.h \
+		../MathShooter/graph.h \
+		../MathShooter/mathcalculator.h \
+		../MathShooter/mathexpression.h \
+		../MathShooter/mathchecker.h \
+		../MathShooter/mathparser.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
+	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/client.h -o moc_client.cpp
+
 moc_field.cpp: ../MathShooter/field.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QFrame \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qframe.h \
@@ -1050,7 +1107,7 @@ moc_field.cpp: ../MathShooter/field.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
 		../MathShooter/obstacle.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
-	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/field.h -o moc_field.cpp
+	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/field.h -o moc_field.cpp
 
 moc_game.cpp: ../MathShooter/game.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QWidget \
@@ -1089,10 +1146,20 @@ moc_game.cpp: ../MathShooter/game.h \
 		../MathShooter/mathexpression.h \
 		../MathShooter/mathchecker.h \
 		../MathShooter/mathparser.h \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QString \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qstring.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
-	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/game.h -o moc_game.cpp
+	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/game.h -o moc_game.cpp
+
+moc_server.cpp: ../MathShooter/server.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpServer \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpserver.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc
+	/Users/aleksandrdudin/Qt/6.4.1/macos/libexec/moc $(DEFINES) -D__APPLE__ -D__GNUC__=4 -D__APPLE_CC__ -D__cplusplus=199711L -D__APPLE_CC__=6000 -D__clang__ -D__clang_major__=13 -D__clang_minor__=1 -D__clang_patchlevel__=6 -D__GNUC__=4 -D__GNUC_MINOR__=2 -D__GNUC_PATCHLEVEL__=1 -I/Users/aleksandrdudin/Qt/6.4.1/macos/mkspecs/macx-clang -I/Users/aleksandrdudin/Desktop/programming.cpp/Технопарк/project.cpp/MathShooter -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers -I/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers -I. -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1 -I/Library/Developer/CommandLineTools/usr/lib/clang/13.1.6/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include -I/Library/Developer/CommandLineTools/usr/include -F/Users/aleksandrdudin/Qt/6.4.1/macos/lib ../MathShooter/server.h -o moc_server.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1111,6 +1178,48 @@ compiler_lex_clean:
 compiler_clean: compiler_moc_header_clean 
 
 ####### Compile
+
+client.o: ../MathShooter/client.cpp ../MathShooter/client.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		../MathShooter/game.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QWidget \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qwidget.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QFrame \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qframe.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QPushButton \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qpushbutton.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QLabel \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qlabel.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QLineEdit \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qlineedit.h \
+		../MathShooter/field.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/QPainter \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtGui.framework/Headers/qpainter.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QSignalMapper \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qsignalmapper.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPair \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpair.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QRandomGenerator \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qrandom.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QTime \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdatetime.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h \
+		../MathShooter/player.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QPoint \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h \
+		../MathShooter/obstacle.h \
+		../MathShooter/graph.h \
+		../MathShooter/mathcalculator.h \
+		../MathShooter/mathexpression.h \
+		../MathShooter/mathchecker.h \
+		../MathShooter/mathparser.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o client.o ../MathShooter/client.cpp
 
 field.o: ../MathShooter/field.cpp ../MathShooter/field.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QFrame \
@@ -1172,8 +1281,6 @@ game.o: ../MathShooter/game.cpp ../MathShooter/game.h \
 		../MathShooter/mathexpression.h \
 		../MathShooter/mathchecker.h \
 		../MathShooter/mathparser.h \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QString \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qstring.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QLayout \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/qlayout.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidgets.framework/Headers/QDialog \
@@ -1185,8 +1292,6 @@ graph.o: ../MathShooter/graph.cpp ../MathShooter/graph.h \
 		../MathShooter/mathexpression.h \
 		../MathShooter/mathchecker.h \
 		../MathShooter/mathparser.h \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QString \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qstring.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o graph.o ../MathShooter/graph.cpp
@@ -1232,14 +1337,19 @@ main.o: ../MathShooter/main.cpp /Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtWidge
 		../MathShooter/mathexpression.h \
 		../MathShooter/mathchecker.h \
 		../MathShooter/mathparser.h \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QString \
-		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qstring.h
+		../MathShooter/server.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpServer \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpserver.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MathShooter/main.cpp
 
 mathcalculator.o: ../MathShooter/mathcalculator.cpp ../MathShooter/mathcalculator.h \
 		../MathShooter/mathexpression.h \
 		../MathShooter/mathchecker.h \
-		../MathShooter/mathparser.h
+		../MathShooter/mathparser.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QDebug \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qdebug.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mathcalculator.o ../MathShooter/mathcalculator.cpp
 
 mathchecker.o: ../MathShooter/mathchecker.cpp ../MathShooter/mathchecker.h
@@ -1271,11 +1381,28 @@ player.o: ../MathShooter/player.cpp ../MathShooter/player.h \
 		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qpoint.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o player.o ../MathShooter/player.cpp
 
+server.o: ../MathShooter/server.cpp ../MathShooter/server.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpServer \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpserver.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/QTcpSocket \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QObject \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qobject.h \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/QVector \
+		/Users/aleksandrdudin/Qt/6.4.1/macos/lib/QtCore.framework/Headers/qvector.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o server.o ../MathShooter/server.cpp
+
+moc_client.o: moc_client.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_client.o moc_client.cpp
+
 moc_field.o: moc_field.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_field.o moc_field.cpp
 
 moc_game.o: moc_game.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_game.o moc_game.cpp
+
+moc_server.o: moc_server.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_server.o moc_server.cpp
 
 ####### Install
 

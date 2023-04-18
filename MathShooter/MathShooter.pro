@@ -1,10 +1,12 @@
 QT       += core gui
+QT       += core network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
 
 SOURCES += \
+    client.cpp \
     field.cpp \
     game.cpp \
     graph.cpp \
@@ -14,9 +16,11 @@ SOURCES += \
     mathexpression.cpp \
     mathparser.cpp \
     obstacle.cpp \
-    player.cpp
+    player.cpp \
+    server.cpp
 
 HEADERS += \
+    client.h \
     field.h \
     game.h \
     graph.h \
@@ -25,7 +29,8 @@ HEADERS += \
     mathexpression.h \
     mathparser.h \
     obstacle.h \
-    player.h
+    player.h \
+    server.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

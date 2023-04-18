@@ -28,6 +28,7 @@ signals:
     void gotTheCoordinates();
 
 private:
+
     Field* m_field;
     QPushButton* fireBtn;
     QPushButton* quitBtn;
@@ -35,6 +36,7 @@ private:
     QLabel* historyInput;
     QVector<QPair<double, double> > m_dots;
     int numberOfPlayers;
+
 };
 
 #endif // GAME_H
