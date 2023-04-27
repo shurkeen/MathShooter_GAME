@@ -45,16 +45,6 @@ int Player::getCenterPosScreenY()
     return centerPosScreenY;
 }
 
-int Player::getSizeDekartDots()
-{
-    return dekartDotsPlayer.size();
-}
-
-int Player::getSizeScreenDots()
-{
-    return screenDotsPlayer.size();
-}
-
 int Player::getCoordinateQuarter()
 {
     if(centerPosDekartX < 0 && centerPosDekartY >= 0){
@@ -67,24 +57,4 @@ int Player::getCoordinateQuarter()
         return 3;
     }
     return 4;
-}
-
-QPair<double, double> Player::getDekardDotsPlayer(int idx)
-{
-    return dekartDotsPlayer[idx];
-}
-
-QPoint Player::getScreenDotsPlayer(int idx)
-{
-    return screenDotsPlayer[idx];
-}
-
-void Player::pushBackInDekartDotsPlayer(QPair<double, double> point)
-{
-    dekartDotsPlayer.push_back(point);
-}
-
-void Player::pushBackInScreenDotsPlayer(QPoint point)
-{
-    screenDotsPlayer.push_back(point);
 }

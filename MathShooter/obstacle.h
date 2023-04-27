@@ -19,13 +19,7 @@ public:
     double getCenterPosDekartY();
     int getCenterPosScreenX();
     int getCenterPosScreenY();
-    int getSizeDekartDots();
-    int getSizeScreenDots();
     double getRadius();
-    QPair<double, double> getDekardDotsObstacle(int);
-    QPoint getScreenDotsObstacle(int);
-    void pushBackInDekartDotsObstacle(QPair<double, double>);
-    void pushBackInScreenDotsObstacle(QPoint);
 
     const static int MAX_RADIUS = 3;
     const static int MIN_RADIUS = 1;
@@ -38,9 +32,6 @@ private:
     int centerPosScreenX;
     int centerPosScreenY;
     double m_radius;
-    QVector<QPair<double, double> > dekartDotsPlayer;
-    QVector<QPoint> screenDotsPlayer;
-
 };
 
 #endif // OBSTACLE_H

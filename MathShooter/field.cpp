@@ -1,10 +1,19 @@
 #include "field.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 Field::Field(QWidget* parent) : QFrame(parent)
 {
-    setFixedSize(860, 500);
+    setFixedSize(FIELD_WEIGHT, FIELD_HEIGHT);
+
     fieldFrame = new QFrame(this);
     fieldFrame->setFrameStyle(QFrame::Box);
+
+    fieldPixmapForGraph = new QPixmap(FIELD_WEIGHT, FIELD_HEIGHT);
+    fieldPixmapForGraph->fill(Qt::transparent);
+
+    fieldPixmapForStaticObjects = new QPixmap(FIELD_WEIGHT, FIELD_HEIGHT);
+    fieldPixmapForStaticObjects->fill(Qt::transparent);
 
     updateDistFactor();
 
@@ -14,12 +23,13 @@ Field::Field(QWidget* parent) : QFrame(parent)
 
 void Field::timerEvent(QTimerEvent *)
 {
-    this->repaint();
+    this->update();
 }
 
 void Field::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
+
     doDrawing();
 }
 
@@ -32,116 +42,21 @@ void Field::resizeEvent(QResizeEvent* event)
 
 void Field::doDrawing()
 {
-    { // отрисовка координатных осей
-        dekartSystemDrawing();
-    }
+    QPainter pain(this);
 
-    { // отрисовка игроков на поле
-        playersDrawing();
-    }
-
-    { // отрисовка неразрушаемых препятствий на поле
-        indestructibleObstracleDrawing();
+    { // отрисовка статических объектов
+        pain.drawPixmap(0, 0, FIELD_WEIGHT, FIELD_HEIGHT, *fieldPixmapForStaticObjects);
     }
 
     { // отрисовка графика функции
         if(inPaintingGraph == 1){
-            //qDebug() << idxPoint;
-            attemptToKill(dekartDotsGraph[idxPoint]);
-            int koff = (int)(1.0 * idxPoint / dekartDotsGraph.size() * 100);
-            for(int i = 0; i < 60 + koff; i++){
-                if(idxPoint < screenDotsGraph.size()){
-                    tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint++]);
-                }
-            }
-            if(!endLength() && idxPoint >= 1 && !checkingOutside(dekartDotsGraph[idxPoint - 1]) &&
-                    !checkingIntersectionGraphWithObstracles(dekartDotsGraph[idxPoint - 1])){
-                graphDrawing();
-            }
-            else{
-                if(idxPoint != 0) endDrawingGraph();
-            }
+            qDebug() << idxPoint;
+            setGroupPointsGraph();
+            pain.drawPixmap(0, 0, FIELD_WEIGHT, FIELD_HEIGHT, *fieldPixmapForGraph);
         }
     }
-}
 
-void Field::graphDrawing()
-{
-
-    m_paint.begin(this);
-
-    m_paint.setBrush(Qt::black);
-    m_paint.setPen(QColorConstants::Svg::brown);
-
-    for(int i = 1; i < tempScreenDotsGraph.size(); i++){
-        m_paint.drawLine(tempScreenDotsGraph[i - 1].rx(), tempScreenDotsGraph[i - 1].ry(),
-                tempScreenDotsGraph[i].rx(), tempScreenDotsGraph[i].ry());
-    }
-
-//    for(const auto& i : tempScreenDotsGraph){
-//        m_paint.drawEllipse(i, 1, 1);
-//    }
-
-    m_paint.end();
-}
-
-void Field::indestructibleObstracleDrawing()
-{
-    m_paint.begin(this);
-
-//    m_paint.setBrush(Qt::black);
-//    m_paint.setPen(Qt::black);
-
-//    for(int i = 0; i < indestructibleObject.size(); i++){
-//        for(int j = 1; j < indestructibleObject[i].getSizeScreenDots(); j++){
-//            m_paint.drawLine(indestructibleObject[i].getScreenDotsObstacle(j - 1), indestructibleObject[i].getScreenDotsObstacle(j));
-//        }
-//    }
-
-    m_paint.setBrush(Qt::black);
-    m_paint.setPen(Qt::black);
-
-    double r = 0;
-    for(int i = 0; i < indestructibleObject.size(); i++){
-        r = indestructibleObject[i].getRadius();
-        r *= 100.0;
-        r *= 1.0 / 3.0;
-        m_paint.drawEllipse(indestructibleObject[i].getCenterPosScreenX() - (int)r / 2, indestructibleObject[i].getCenterPosScreenY() - (int)r / 2, r, r);
-    }
-
-    m_paint.end();
-}
-
-void Field::playersDrawing()
-{
-    m_paint.begin(this);
-
-//    for(int i = 0; i < m_players.size(); i++){
-//        for(int j = 1; j < m_players[i].getSizeScreenDots(); j++){
-//            m_paint.drawLine(m_players[i].getScreenDotsPlayer(j - 1), m_players[i].getScreenDotsPlayer(j));
-//        }
-//    }
-
-    m_paint.setPen(QPen(Qt::green,Qt::SolidLine));
-    m_paint.setBrush(Qt::yellow);
-
-    for(int i = 0; i < m_players.size(); i++){
-        m_paint.drawEllipse(m_players[i].getCenterPosScreenX() - 15, m_players[i].getCenterPosScreenY() - 15, 30, 30);
-    }
-
-    m_paint.end();
-}
-
-void Field::dekartSystemDrawing()
-{
-    m_paint.begin(this);
-
-    m_paint.setPen(Qt::black);
-
-    m_paint.drawLine(0, this->height() / 2, this->width(), this->height() / 2);
-    m_paint.drawLine(this->width() / 2, 0, this->width() / 2, this->height());
-
-    m_paint.end();
+    pain.end();
 }
 
 void Field::convertToScreenSystem()
@@ -172,7 +87,7 @@ void Field::updateDistFactor()
 
 bool Field::checkingOutside(QPair<double, double> point)
 {
-    if(abs(point.first) > X_LENGTH / 2 || abs(point.second) > Y_LENGTH / 2){
+    if(abs((abs(point.first) - X_LENGTH / 2)) < OUTSIDE_EPS || abs((abs(point.second) - Y_LENGTH / 2)) < OUTSIDE_EPS){
         return true;
     }
     return false;
@@ -180,23 +95,21 @@ bool Field::checkingOutside(QPair<double, double> point)
 
 bool Field::checkingIntersectionGraphWithPlayers(QPair<double, double> point, int idxPlayer)
 {
-    for(int j = 0; j < m_players[idxPlayer].getSizeDekartDots(); j++){
-        if(fabs(point.first - m_players[idxPlayer].getDekardDotsPlayer(j).first) +
-           fabs(point.second - m_players[idxPlayer].getDekardDotsPlayer(j).second) < KILL_EPS){
-            return true;
-        }
+    double dist = 0;
+    dist = distanceBetweenTwoPoints(point.first, point.second, m_players[idxPlayer].getCenterPosDekartX(), m_players[idxPlayer].getCenterPosDekartY());
+    if(dist < Player::M_RADIUS + KILL_EPS){
+        return true;
     }
     return false;
 }
 
 bool Field::checkingIntersectionGraphWithObstracles(QPair<double, double> point)
 {
+    double dist = 0;
     for(int i = 0; i < indestructibleObject.size(); i++){
-        for(int j = 0; j < indestructibleObject[i].getSizeDekartDots(); j++){
-            if(fabs(point.first - indestructibleObject[i].getDekardDotsObstacle(j).first) +
-                fabs(point.second - indestructibleObject[i].getDekardDotsObstacle(j).second) < INTERSECTION_EPS){
-                return true;
-            }
+        dist = distanceBetweenTwoPoints(point.first, point.second, indestructibleObject[i].getCenterPosDekartX(), indestructibleObject[i].getCenterPosDekartY());
+        if(dist < indestructibleObject[i].getRadius()){
+            return true;
         }
     }
     return false;
@@ -214,8 +127,9 @@ bool Field::checkingIntersectionPlayersWithObstracle(double X0, double Y0, doubl
     return false;
 }
 
-void Field::attemptToKill(QPair<double, double> point)
+bool Field::attemptToKill(QPair<double, double> point)
 {
+    bool kill_flag = false;
     for(int i = 0; i < m_players.size(); i++){
         if(i != ((idxPlayer - 1 +  m_players.size()) %  m_players.size()) && checkingIntersectionGraphWithPlayers(point, i)){
             for(int j = i; j < m_players.size() - 1; j++){
@@ -223,8 +137,10 @@ void Field::attemptToKill(QPair<double, double> point)
             }
             m_players.resize(m_players.size() - 1);
             idxPlayer = idxPlayer % m_players.size();
+            kill_flag = true;
         }
     }
+    return kill_flag;
 }
 
 bool Field::endLength()
@@ -237,12 +153,15 @@ void Field::endDrawingGraph()
     killTimer(timerId);
     inPaintingGraph = 0;
     tempScreenDotsGraph.clear();
+
+    delete fieldPixmapForGraph;
+    fieldPixmapForGraph = new QPixmap(FIELD_WEIGHT, FIELD_HEIGHT);
+    fieldPixmapForGraph->fill(Qt::transparent);
 }
 
 void Field::initPlayers()
 {
     initCenterPosForPlayers();
-    initDotsForPlayers();
 }
 
 void Field::initCenterPosForPlayers()
@@ -268,92 +187,95 @@ void Field::initCenterPosForPlayers()
     }
 }
 
-void Field::initDotsForPlayers()
+void Field::setPixmapStaticObjects()
 {
-    for(int i = 0; i < m_players.size(); i++){
-        double x0 = m_players[i].getCenterPosDekartX();
-        double y0 = m_players[i].getCenterPosDekartY();
-        double r = m_players[i].M_RADIUS;
-        double w = r;
-        double h = 0;
-        double tmpX1 = 0;
-        double tmpX2 = 0;
-        double tmpX3 = 0;
-        double tmpX4 = 0;
-        double tmpY1 = 0;
-        double tmpY2 = 0;
-        double tmpY3 = 0;
-        double tmpY4 = 0;
-
-        while(w > 0){
-            h = qSqrt(r * r - w * w);
-
-            tmpX1 = x0 + w;
-            tmpY1 = y0 + h;
-
-            tmpX2 = x0 + w;
-            tmpY2 = y0 - h;
-
-            tmpX3 = x0 - w;
-            tmpY3 = y0 - h;
-
-            tmpX4 = x0 - w;
-            tmpY4 = y0 + h;
-
-            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX1, tmpY1));
-            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX2, tmpY2));
-            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX3, tmpY3));
-            m_players[i].pushBackInDekartDotsPlayer(QPair<double, double>(tmpX4, tmpY4));
-            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX1), convertY_Axes(tmpY1)));
-            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX2), convertY_Axes(tmpY2)));
-            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX3), convertY_Axes(tmpY3)));
-            m_players[i].pushBackInScreenDotsPlayer(QPoint(convertX_Axes(tmpX4), convertY_Axes(tmpY4)));
-            w -= Player::K_POLYGON;
-        }
-    }
+    setDekartSystem();
+    setIndestructibleObstracle();
+    setPlayers();
 }
 
-void Field::initDotsForIndestructibleObstracle()
+void Field::setDekartSystem()
 {
+    QPainter *pain = new QPainter(fieldPixmapForStaticObjects);
+
+    pain->setPen(Qt::black);
+
+    pain->drawLine(0, this->height() / 2, this->width(), this->height() / 2);
+    pain->drawLine(this->width() / 2, 0, this->width() / 2, this->height());
+
+    delete pain;
+}
+
+void Field::setIndestructibleObstracle()
+{
+    QPainter *pain = new QPainter(fieldPixmapForStaticObjects);
+
+    pain->setBrush(Qt::black);
+    pain->setPen(Qt::black);
+
+    double r = 0;
     for(int i = 0; i < indestructibleObject.size(); i++){
-        double x0 = indestructibleObject[i].getCenterPosDekartX();
-        double y0 = indestructibleObject[i].getCenterPosDekartY();
-        double r = indestructibleObject[i].getRadius();
-        double w = r;
-        double h = 0;
-        double tmpX1 = 0;
-        double tmpX2 = 0;
-        double tmpX3 = 0;
-        double tmpX4 = 0;
-        double tmpY1 = 0;
-        double tmpY2 = 0;
-        double tmpY3 = 0;
-        double tmpY4 = 0;
+        r = indestructibleObject[i].getRadius();
+        r *= 100.0;
+        r *= 1.0 / 3.0;
+        pain->drawEllipse(indestructibleObject[i].getCenterPosScreenX() - (int)r / 2, indestructibleObject[i].getCenterPosScreenY() - (int)r / 2, r, r);
+    }
 
-        while(w > 0){
-            h = qSqrt(r * r - w * w);
+    delete pain;
+}
 
-            tmpX1 = x0 + w;
-            tmpY1 = y0 + h;
+void Field::setPlayers()
+{
+    QPainter *pain = new QPainter(fieldPixmapForStaticObjects);
 
-            tmpX2 = x0 + w;
-            tmpY2 = y0 - h;
+    pain->setPen(QPen(Qt::green,Qt::SolidLine));
+    pain->setBrush(Qt::yellow);
 
-            tmpX3 = x0 - w;
-            tmpY3 = y0 - h;
+    for(int i = 0; i < m_players.size(); i++){
+        pain->drawEllipse(m_players[i].getCenterPosScreenX() - 15, m_players[i].getCenterPosScreenY() - 15, 30, 30);
+    }
 
-            tmpX4 = x0 - w;
-            tmpY4 = y0 + h;
+    delete pain;
+}
 
-            indestructibleObject[i].pushBackInDekartDotsObstacle(QPair<double, double>(tmpX1, tmpY1));
-            indestructibleObject[i].pushBackInDekartDotsObstacle(QPair<double, double>(tmpX2, tmpY2));
-            indestructibleObject[i].pushBackInDekartDotsObstacle(QPair<double, double>(tmpX3, tmpY3));
-            indestructibleObject[i].pushBackInDekartDotsObstacle(QPair<double, double>(tmpX4, tmpY4));
-            indestructibleObject[i].pushBackInScreenDotsObstacle(QPoint(convertX_Axes(tmpX1), convertY_Axes(tmpY1)));
-            indestructibleObject[i].pushBackInScreenDotsObstacle(QPoint(convertX_Axes(tmpX2), convertY_Axes(tmpY2)));
-            indestructibleObject[i].pushBackInScreenDotsObstacle(QPoint(convertX_Axes(tmpX3), convertY_Axes(tmpY3)));
-            indestructibleObject[i].pushBackInScreenDotsObstacle(QPoint(convertX_Axes(tmpX4), convertY_Axes(tmpY4)));
-            w -= Obstacle::K_POLYGON;
+void Field::setPointGraph()
+{
+    QPainter *pain = new QPainter(fieldPixmapForGraph);
+
+    pain->setBrush(Qt::black);
+    pain->setPen(QColorConstants::Svg::brown);
+
+    if(attemptToKill(dekartDotsGraph[idxPoint])){
+        delete fieldPixmapForStaticObjects;
+        fieldPixmapForStaticObjects = new QPixmap(FIELD_WEIGHT, FIELD_HEIGHT);
+        fieldPixmapForStaticObjects->fill(Qt::transparent);
+        setPixmapStaticObjects();
+    }
+    pain->drawLine(tempScreenDotsGraph[idxPoint - 1].rx(), tempScreenDotsGraph[idxPoint - 1].ry(),
+            tempScreenDotsGraph[idxPoint].rx(), tempScreenDotsGraph[idxPoint].ry());
+
+    delete pain;
+}
+
+void Field::setGroupPointsGraph()
+{
+    if(idxPoint == 0){
+        tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint]);
+        idxPoint++;
+    }
+    int koff = (int)(1.0 * idxPoint / dekartDotsGraph.size() * 100);
+    for(int i = 1; i < 60 + koff; i++){
+        if(idxPoint < dekartDotsGraph.size()){
+            if(checkingOutside(dekartDotsGraph[idxPoint]) ||
+               checkingIntersectionGraphWithObstracles(dekartDotsGraph[idxPoint])){
+                endDrawingGraph();
+                break;
+            }
+            else{
+                tempScreenDotsGraph.push_back(screenDotsGraph[idxPoint]);
+                setPointGraph();
+                idxPoint++;
+            }
         }
     }
 }
@@ -370,6 +292,7 @@ double Field::differenceBetweenY0andYi(const QVector<QPair<double, double>>& m_d
 
 void Field::movePlayer()
 {
+
     updateField();
     setNextPlayer();
 }
@@ -390,6 +313,7 @@ void Field::updateCountPlayers(int countPlayers)
 
     initPlayers();
     initIndestructibleObstracle();
+    setPixmapStaticObjects();
 }
 
 void Field::updateCoordGraph(const QVector<QPair<double, double>>& m_dots)
@@ -522,7 +446,6 @@ void Field::initCenterPosForIndestructibleObstracle()
 void Field::initIndestructibleObstracle()
 {
     initCenterPosForIndestructibleObstracle();
-    initDotsForIndestructibleObstracle();
 }
 
 double Field::distanceBetweenTwoPoints(double x1, double y1, double x2, double y2)

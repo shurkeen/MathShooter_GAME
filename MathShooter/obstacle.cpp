@@ -56,37 +56,7 @@ int Obstacle::getCenterPosScreenY()
     return centerPosScreenY;
 }
 
-int Obstacle::getSizeDekartDots()
-{
-    return dekartDotsPlayer.size();
-}
-
-int Obstacle::getSizeScreenDots()
-{
-    return screenDotsPlayer.size();
-}
-
 double Obstacle::getRadius()
 {
     return m_radius;
-}
-
-QPair<double, double> Obstacle::getDekardDotsObstacle(int idx)
-{
-    return dekartDotsPlayer[idx];
-}
-
-QPoint Obstacle::getScreenDotsObstacle(int idx)
-{
-    return screenDotsPlayer[idx];
-}
-
-void Obstacle::pushBackInDekartDotsObstacle(QPair<double, double> point)
-{
-    dekartDotsPlayer.push_back(point);
-}
-
-void Obstacle::pushBackInScreenDotsObstacle(QPoint point)
-{
-    screenDotsPlayer.push_back(point);
 }

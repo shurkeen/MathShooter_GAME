@@ -40,11 +40,11 @@ Game::Game(QWidget* parent) : QWidget(parent)
         this->setLayout(layout);
     }
 
-    { // связь изменений массивов декартовых координат между классами Game и Fiedl
+    { // связь изменений массивов декартовых координат между классами Game и Field
         connect(this, &Game::coordUpdated, this->m_field, [this]{this->m_field->updateCoordGraph(this->m_dots);});
     }
 
-    { // связь изменений количества игроков между классами Game и Fiedl
+    { // связь изменений количества игроков между классами Game и Field
         connect(this, &Game::countPlayersUpdated, this->m_field, [this]{this->m_field->updateCountPlayers(this->numberOfPlayers);});
     }
 
@@ -77,7 +77,7 @@ void Game::gettingCoord()
     graph.Evaluate(-Field::X_LENGTH / 2, Field::X_LENGTH / 2);
 
     m_dots.clear();
-    for(int i = 0; i < graph.getNumberOfGraphPoints(); i++){
+    for(int i = 1; i < graph.getNumberOfGraphPoints(); i++){
         m_dots.push_back({graph.getDekartPosInGraphForX_Axis(i), graph.getDekartPosInGraphForY_Axis(i)});
     }
     //m_dots.push_back({1, 2});
