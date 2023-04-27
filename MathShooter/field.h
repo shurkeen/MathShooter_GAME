@@ -42,10 +42,11 @@ private:
     static const int FIELD_WEIGHT = 860;
     static const int FIELD_HEIGHT = 500;
     constexpr static const QColor colorField = QColor(237, 237, 237);
-    static const int DELAY = 10;
+    static const int DELAY = 3;
     static const int distanceBetweenPlayerAndAxisX = 7;
     static const int distanceBetweenPlayerAndAxisY = 3;
     constexpr static const double KILL_EPS = 2e-1;
+    constexpr static const double DIFF_GRAPH_PLAYER_EPS = 2e-1;
     constexpr static const double INTERSECTION_EPS = 5e-1;
     constexpr static const double OUTSIDE_EPS = 6e-2;
     constexpr static const double DIFF_EPS = 1e-6;

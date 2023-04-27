@@ -322,15 +322,28 @@ void Field::updateCoordGraph(const QVector<QPair<double, double>>& m_dots)
     double tmpDekartAxisX = 0;
     double tmpDekartAxisY = 0;
     double diff = differenceBetweenY0andYi(m_dots);
+    int X0 = m_players[idxPlayer].getCenterPosDekartX();
+    int Y0 = m_players[idxPlayer].getCenterPosDekartY();
     for(const auto& i : m_dots){
         tmpDekartAxisX = i.first;
         tmpDekartAxisY = i.second + diff;
         if((m_players[idxPlayer].getCoordinateQuarter() == 2 || m_players[idxPlayer].getCoordinateQuarter() == 3)
-                && tmpDekartAxisX < m_players[idxPlayer].getCenterPosDekartX() - Player::M_RADIUS){
-            this->dekartDotsGraph.push_back(QPair<double, double>(tmpDekartAxisX, tmpDekartAxisY));
+                && tmpDekartAxisX < X0){
+            if(distanceBetweenTwoPoints(tmpDekartAxisX, tmpDekartAxisY, X0, Y0) - Player::M_RADIUS > DIFF_GRAPH_PLAYER_EPS){
+                this->dekartDotsGraph.push_back(QPair<double, double>(tmpDekartAxisX, tmpDekartAxisY));
+            }
+            else{
+                break;
+            }
         }
         if((m_players[idxPlayer].getCoordinateQuarter() == 1 || m_players[idxPlayer].getCoordinateQuarter() == 4)
-                && tmpDekartAxisX > m_players[idxPlayer].getCenterPosDekartX() + Player::M_RADIUS){
+                && tmpDekartAxisX > X0){
+            if(distanceBetweenTwoPoints(tmpDekartAxisX, tmpDekartAxisY, X0, Y0) - Player::M_RADIUS > DIFF_GRAPH_PLAYER_EPS){
+                this->dekartDotsGraph.push_back(QPair<double, double>(tmpDekartAxisX, tmpDekartAxisY));
+            }
+            else{
+                this->dekartDotsGraph.clear();
+            }
             this->dekartDotsGraph.push_back(QPair<double, double>(tmpDekartAxisX, tmpDekartAxisY));
         }
     }
@@ -340,6 +353,7 @@ void Field::updateCoordGraph(const QVector<QPair<double, double>>& m_dots)
             swap(this->dekartDotsGraph[i], this->dekartDotsGraph[this->dekartDotsGraph.size() - 1 - i]);
         }
     }
+    qDebug() << "MMM: " << this->dekartDotsGraph.size();
     convertToScreenSystem();
 }
 
