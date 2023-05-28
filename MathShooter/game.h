@@ -18,6 +18,7 @@ public:
     Game(QWidget* parent = 0);
     void initGame();
     void gettingCountPlayers();
+    constexpr static const QSize SIZE = QSize(860, 624);
 
 public slots:
     void gettingCoord();

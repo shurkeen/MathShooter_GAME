@@ -10,7 +10,7 @@
 Game::Game(QWidget* parent) : QWidget(parent)
 {
 
-    resize(900, 600);
+    resize(Game::SIZE);
 
     { // компоновка виджетов
         m_field = new Field(this);
@@ -52,7 +52,7 @@ Game::Game(QWidget* parent) : QWidget(parent)
         connect(this, &Game::gotTheCoordinates, this->m_field, &Field::movePlayer);
     }
 
-    { // связь кнопки "push" c вычислением координат графика на поле
+    { // связь кнопки "Fire" c вычислением координат графика на поле
         connect(fireBtn, &QPushButton::clicked, this, &Game::gettingCoord);
     }
 

@@ -3,6 +3,7 @@
 #include "client.h"
 #include "game.h"
 #include "server.h"
+#include "pageswidget.h"
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -12,9 +13,13 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
    // Server server;
-    Game* m_game = new Game;
-    m_game->initGame();
-    m_game->show();
+//    Game* m_game = new Game;
+//    m_game->initGame();
+//    m_game->show();
+
+    MyBaseStackedWidget baseWidget;
+
+    baseWidget.MyShow();
 
 //    QMainWindow *win1 = new QMainWindow();
 //    win1->resize(800, 800);

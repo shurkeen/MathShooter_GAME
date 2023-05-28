@@ -16,6 +16,7 @@ SOURCES += \
     mathexpression.cpp \
     mathparser.cpp \
     obstacle.cpp \
+    pageswidget.cpp \
     player.cpp \
     server.cpp
 
@@ -29,6 +30,7 @@ HEADERS += \
     mathexpression.h \
     mathparser.h \
     obstacle.h \
+    pageswidget.h \
     player.h \
     server.h
 

@@ -1,6 +1,7 @@
 #include "field.h"
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QSizePolicy>
 
 Field::Field(QWidget* parent) : QFrame(parent)
 {
@@ -50,7 +51,7 @@ void Field::doDrawing()
 
     { // отрисовка графика функции
         if(inPaintingGraph == 1){
-            qDebug() << idxPoint;
+            //qDebug() << idxPoint;
             setGroupPointsGraph();
             pain.drawPixmap(0, 0, FIELD_WEIGHT, FIELD_HEIGHT, *fieldPixmapForGraph);
         }
