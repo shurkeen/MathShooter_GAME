@@ -69,6 +69,11 @@ void Game::initGame()
     // gettingCoord();
 }
 
+void Game::initGame(QVector<Obstacle> m_obstacles, QVector<Player> m_players)
+{
+    this->m_field->updateCountPlayersAndInitStaticObjects(m_obstacles, m_players);
+}
+
 void Game::gettingCoord()
 {
 
@@ -90,4 +95,9 @@ void Game::gettingCountPlayers()
 {
     numberOfPlayers = 4;
     emit this->countPlayersUpdated();
+}
+
+Field *Game::getPointField()
+{
+    return m_field;
 }

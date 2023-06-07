@@ -17,8 +17,10 @@ class Game : public QWidget
 public:
     Game(QWidget* parent = 0);
     void initGame();
+    void initGame(QVector<Obstacle>, QVector<Player>);
     void gettingCountPlayers();
-    constexpr static const QSize SIZE = QSize(860, 624);
+    Field* getPointField();
+    constexpr static const QSize SIZE = QSize(885, 624);
 
 public slots:
     void gettingCoord();

@@ -165,6 +165,15 @@ void Field::initPlayers()
     initCenterPosForPlayers();
 }
 
+void Field::initPlayersFromServer(QVector<Player>& playersFromServer)
+{
+    m_players = playersFromServer;
+    for(int i = 0; i < m_players.size(); i++){
+        m_players[i].setCenterPosScreenX(convertX_Axes(m_players[i].getCenterPosDekartX()));
+        m_players[i].setCenterPosScreenY(convertY_Axes(m_players[i].getCenterPosDekartY()));
+    }
+}
+
 void Field::initCenterPosForPlayers()
 {
     QTime zerno(0, 0, 0);
@@ -232,8 +241,12 @@ void Field::setPlayers()
     pain->setPen(QPen(Qt::green,Qt::SolidLine));
     pain->setBrush(Qt::yellow);
 
+  //  double r = 0;
     for(int i = 0; i < m_players.size(); i++){
-        pain->drawEllipse(m_players[i].getCenterPosScreenX() - 15, m_players[i].getCenterPosScreenY() - 15, 30, 30);
+//        r = Player::M_RADIUS; // TO DOOOOOO!!!!
+//        r *= 100;
+//        r *= 1.0 / 3.0;
+        pain->drawEllipse(m_players[i].getCenterPosScreenX() - 30 / 2, m_players[i].getCenterPosScreenY() - 30 / 2, 30, 30);
     }
 
     delete pain;
@@ -306,6 +319,25 @@ void Field::setNextPlayer()
 int Field::getNumberOfPlayers()
 {
     return m_players.size();
+}
+
+QVector<Player> Field::getPlayers()
+{
+    return m_players;
+}
+
+QVector<Obstacle> Field::getPlayersIndestructibleObject()
+{
+    return indestructibleObject;
+}
+
+void Field::updateCountPlayersAndInitStaticObjects(QVector<Obstacle> m_obstacles, QVector<Player> m_players)
+{
+    m_players.resize(m_players.size());
+
+    initPlayersFromServer(m_players);
+    initObstacleFromServer(m_obstacles);
+    setPixmapStaticObjects();
 }
 
 void Field::updateCountPlayers(int countPlayers)
@@ -461,6 +493,15 @@ void Field::initCenterPosForIndestructibleObstracle()
 void Field::initIndestructibleObstracle()
 {
     initCenterPosForIndestructibleObstracle();
+}
+
+void Field::initObstacleFromServer(QVector<Obstacle>& obstacleFromServer)
+{
+    indestructibleObject = obstacleFromServer;
+    for(int i = 0; i < indestructibleObject.size(); i++){
+        indestructibleObject[i].setCenterPosScreenX(convertX_Axes(indestructibleObject[i].getCenterPosDekartX()));
+        indestructibleObject[i].setCenterPosScreenY(convertY_Axes(indestructibleObject[i].getCenterPosDekartY()));
+    }
 }
 
 double Field::distanceBetweenTwoPoints(double x1, double y1, double x2, double y2)

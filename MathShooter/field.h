@@ -23,8 +23,11 @@ class Field : public QFrame
 public:
     Field(QWidget* parent = 0);
     int getNumberOfPlayers();
+    QVector<Player> getPlayers();
+    QVector<Obstacle> getPlayersIndestructibleObject();
+    void updateCountPlayersAndInitStaticObjects(QVector<Obstacle>, QVector<Player>);
     void movePlayer();
-        void setNextPlayer();
+    void setNextPlayer();
 
     constexpr static const double X_LENGTH = 50.0;
     constexpr static const double Y_LENGTH = 30.0;
@@ -71,6 +74,7 @@ private:
     bool endLength();
     void endDrawingGraph();
     void initPlayers();
+    void initPlayersFromServer(QVector<Player>&);
     void initCenterPosForPlayers();
     void setPixmapStaticObjects();
     void setDekartSystem();
@@ -82,6 +86,7 @@ private:
     void updateField();
     void initCenterPosForIndestructibleObstracle();
     void initIndestructibleObstracle();
+    void initObstacleFromServer(QVector<Obstacle>& );
     double distanceBetweenTwoPoints(double, double, double, double);
     double findOffsetXForCenterPosObstracle(double, double, double);
     double angleTanBetweenDxDyObstracle(double, double);
