@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QMovie>
 
 class MyBaseStackedWidget : public QWidget{
     Q_OBJECT
@@ -71,6 +72,8 @@ public:
     void setConnectedText();
     void setUnConnectedText();
     void unsetConnectedText();
+    void setText(QString);
+    QLabel* timeBeforeStartGameLabel;
     QPushButton *BtnBack;
     QPushButton *BtnConnectGame;
     QPushButton *BtnStartGame;
@@ -81,6 +84,7 @@ public:
     QVBoxLayout* connectedAndMainLayout;
     QHBoxLayout* connectedRightLayout;
     QHBoxLayout* middleLayout;
+    QHBoxLayout* rightLabelTimeLayout;
     QLabel *connectedFlag;
     ~MySecondPageConnectGameWidget();
     constexpr static const QSize SIZE = QSize(600, 600);
@@ -95,14 +99,37 @@ class MyThirdPageWaitingServerWidget: public QWidget{
     Q_OBJECT
 public:
     MyThirdPageWaitingServerWidget(QWidget* parent = 0);
+    ~MyThirdPageWaitingServerWidget();
+
     constexpr static const QSize SIZE = QSize(600, 600);
+
+    QLabel* countConnectedLabelPlayers;
+    QLabel* countStartedLabelPlayers;
+    QLabel* movieGifLabel;
+    QLabel* timeBeforeStartGameLabel;
+    QMovie *movieGif;
+    QVBoxLayout* labelPlayersLayout;
+    QVBoxLayout* layoutThirdPage;
+    QHBoxLayout* rightLabelPlayersLayout;
+    QHBoxLayout* rightLabelTimeLayout;
+    QHBoxLayout* middleMovieGifLayout;
 };
 
 class MyThirdPageWaitingClientWidget: public QWidget{
     Q_OBJECT
 public:
     MyThirdPageWaitingClientWidget(QWidget* parent = 0);
+    ~MyThirdPageWaitingClientWidget();
+
     constexpr static const QSize SIZE = QSize(600, 600);
+
+    QLabel* movieGifLabel;
+    QLabel* timeBeforeStartGameLabel;
+    QMovie *movieGif;
+    QVBoxLayout* layoutThirdPage;
+    QHBoxLayout* rightLabelTimeLayout;
+    QHBoxLayout* middleMovieGifLayout;
+
 };
 
 #endif // PAGESWIDGET_H

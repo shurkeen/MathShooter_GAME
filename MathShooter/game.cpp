@@ -66,7 +66,6 @@ Game::Game(QWidget* parent) : QWidget(parent)
 void Game::initGame()
 {
     gettingCountPlayers();
-    // gettingCoord();
 }
 
 void Game::initGame(QVector<Obstacle> m_obstacles, QVector<Player> m_players)
@@ -85,7 +84,6 @@ void Game::gettingCoord()
     for(int i = 1; i < graph.getNumberOfGraphPoints(); i++){
         m_dots.push_back({graph.getDekartPosInGraphForX_Axis(i), graph.getDekartPosInGraphForY_Axis(i)});
     }
-    //m_dots.push_back({1, 2});
 
     emit this->coordUpdated();
     emit this->gotTheCoordinates();

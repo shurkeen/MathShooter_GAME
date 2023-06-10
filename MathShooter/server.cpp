@@ -9,11 +9,21 @@ MyTcpServer::MyTcpServer(QObject *parent) : QObject(parent)
     connect(mTcpServer, &QTcpServer::newConnection, this, &MyTcpServer::slotNewConnection);
 
     m_timer = new QTimer(this);
+    gameStartTimer = new QTimer(this);
 
     connect(m_timer, &QTimer::timeout, this, &MyTcpServer::checkNetworkConfiguration);
+    connect(gameStartTimer, &QTimer::timeout, this, &MyTcpServer::updateTimeStartGame);
 
     m_game = new Game;
     countConnectedPlayers = 0;
+    countStartedPlayers = 0;
+    countSecondBeforeStartGame = 0;
+    slotNewConnectionPermit = true;
+}
+
+MyTcpServer::~MyTcpServer()
+{
+    startedGamePlayersSocket.clear();
 }
 
 void MyTcpServer::serverStartListen(int port)
@@ -44,7 +54,14 @@ void MyTcpServer::serverEndListen()
             qDebug() << "SOCKET: " << sock->localAddress();
             sock->disconnectFromHost();
         }
+        for(auto& sock : startedGamePlayersSocket){
+            sock->disconnectFromHost();
+        }
         mVTcpSocket.clear();
+        startedGamePlayersSocket.clear();
+        gameStartTimer->stop();
+        countSecondBeforeStartGame = 0;
+        slotNewConnectionPermit = true;
         qDebug() << "server close";
     }
 }
@@ -126,6 +143,16 @@ int MyTcpServer::getCountConnectedPlayers()
     return countConnectedPlayers;
 }
 
+int MyTcpServer::getCountStartedPlayers()
+{
+    return countStartedPlayers;
+}
+
+int MyTcpServer::getCountSecondsBeforeStartGame()
+{
+    return MyTcpServer::TIME_WAITING_START_GAME - countSecondBeforeStartGame;
+}
+
 QString MyTcpServer::getServerAddress()
 {
     checkNetworkConfiguration();
@@ -134,6 +161,8 @@ QString MyTcpServer::getServerAddress()
 
 void MyTcpServer::serverInitStartGame()
 {
+    finishCountConnectedPlayers = countConnectedPlayers;
+
     for(int i = 0; i < mVTcpSocket.size(); i++){
         QByteArray array;
         QDataStream out(&array, QIODevice::WriteOnly);
@@ -146,53 +175,82 @@ void MyTcpServer::serverInitStartGame()
         mVTcpSocket[i] -> write(array);
     }
 
+    gameStartTimer->start(1000);
+}
+
+void MyTcpServer::stopNewConnectionOnServer()
+{
+    qDebug() << "PAUSE";
+    slotNewConnectionPermit = false;
 }
 
 void MyTcpServer::slotNewConnection()
 {
-    mVTcpSocket.push_back(mTcpServer -> nextPendingConnection());
-    countConnectedPlayers++;
+    if(slotNewConnectionPermit == true){
+        if(countConnectedPlayers < 4){
+            qDebug() << "NEW";
+            mVTcpSocket.push_back(mTcpServer -> nextPendingConnection());
+            countConnectedPlayers++;
 
-    //mVTcpSocket[mVTcpSocket.size() - 1]->write("Zdarova zaebal\n");
-    initClientStaticObject();
+            connect(mVTcpSocket[mVTcpSocket.size() - 1], &QTcpSocket::readyRead, this, &MyTcpServer::slotServerRead);
+            connect(mVTcpSocket[mVTcpSocket.size() - 1], &QTcpSocket::disconnected, this, &MyTcpServer::slotClientDisconnection);
 
-    connect(mVTcpSocket[mVTcpSocket.size() - 1], &QTcpSocket::readyRead, this, &MyTcpServer::slotServerRead);
-    connect(mVTcpSocket[mVTcpSocket.size() - 1], &QTcpSocket::disconnected, this, &MyTcpServer::slotClientDisconnection);
+            emit addNewPlayer();
+        }
+        else{
+            QTcpSocket* newSock = mTcpServer -> nextPendingConnection();
 
-    emit addNewPlayer();
+            QByteArray array;
+            QDataStream out(&array, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_6_2);
+
+            QString str = "number of players exceeded";
+            out << str;
+
+            newSock -> write(array);
+
+            newSock->waitForBytesWritten();
+
+            newSock->disconnectFromHost();
+
+            delete newSock;
+        }
+    }
+    else{
+        QTcpSocket* newSock = mTcpServer -> nextPendingConnection();
+
+        QByteArray array;
+        QDataStream out(&array, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_6_2);
+
+        QString str = "connection timed out";
+        out << str;
+
+        newSock -> write(array);
+
+        newSock->waitForBytesWritten();
+
+        newSock->disconnectFromHost();
+
+        delete newSock;
+    }
 }
 
 void MyTcpServer::slotServerRead()
 {
     for(int from = 0; from < mVTcpSocket.size(); from++){
         while(mVTcpSocket[from] -> bytesAvailable() > 0){
-            //read
-            QByteArray array;
-            QDataStream out(&array, QIODevice::WriteOnly);
-            out <<  mVTcpSocket[from] -> readAll();
-            //
+            QDataStream input(mVTcpSocket[from]);
+            input.setVersion(QDataStream::Qt_6_2);
 
-            //write
-            QVector<int> qq;
-            int tmp = 0;
-            for(int i = 0; i < array.size(); i++){
-                if(array.at(i) == ' '){
-                    qq.push_back(tmp);
-                    tmp = 0;
-                }
-                else if(array.at(i) >= '0' && array.at(i) <= '9'){
-                    tmp = tmp * 10 + (array.at(i) - '0');
-                }
-            }
-            qq.push_back(tmp);
-            for(const auto& i : qq){
-                qDebug() << i << " ";
-            }
-            //
+            QString str;
 
-            for(int to = 0; to < mVTcpSocket.size(); to++){
-                mVTcpSocket[to] -> write(array);
-                //mVTcpSocket[to] -> write("16.02.2003Alex\n");
+            input >> str;
+
+            if(str ==  "StartNewClient"){
+                countStartedPlayers++;
+                startedGamePlayersSocket.push_back(mVTcpSocket[from]);
+                emit getServerNewPlayersStart();
             }
         }
     }
@@ -210,7 +268,17 @@ void MyTcpServer::slotClientDisconnection()
         }
     }
 
+    for(int i = 0; i < startedGamePlayersSocket.size(); i++){
+        if(startedGamePlayersSocket[i]->state() == QAbstractSocket::UnconnectedState){
+            auto it = startedGamePlayersSocket.begin() + i;
+            startedGamePlayersSocket[i]->disconnectFromHost();
+            startedGamePlayersSocket.erase(it);
+            break;
+        }
+    }
+
     countConnectedPlayers--;
+    countStartedPlayers = fmax(0, countStartedPlayers - 1);
 
     emit reducePlayer();
 }
@@ -228,8 +296,36 @@ void MyTcpServer::checkNetworkConfiguration()
         serverAddress = newServerAddress;
         if(serverAddress != ""){
             serverEndListen();
-            emit updateServerAddress(); // To DOOO!!! обработать его
+            emit updateServerAddress();
         }
     }
     qDebug() << serverAddress;
+}
+
+void MyTcpServer::updateTimeStartGame()
+{
+    if(countSecondBeforeStartGame <= MyTcpServer::TIME_WAITING_START_GAME){
+        emit signalUpdateTimeStartGame();
+
+        countSecondBeforeStartGame++;
+    }
+    else{
+        gameStartTimer->stop();
+        countSecondBeforeStartGame = 0;
+
+        initGame();
+
+        std::sort(mVTcpSocket.begin(), mVTcpSocket.end());
+        std::sort(startedGamePlayersSocket.begin(), startedGamePlayersSocket.end());
+        for(int i = 0; i < mVTcpSocket.size(); i++){
+            if(std::find(startedGamePlayersSocket.begin(), startedGamePlayersSocket.end(), mVTcpSocket[i]) == startedGamePlayersSocket.end()){
+                mVTcpSocket[i]->disconnectFromHost();
+            }
+        }
+
+        mVTcpSocket = startedGamePlayersSocket;
+        initClientStaticObject();
+
+        emit beginToPlay();
+    }
 }

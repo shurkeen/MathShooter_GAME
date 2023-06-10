@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/gifs">
+        <file>gifs/rofl_loading.gif</file>
+        <file>gifs/miniml_loading.gif.gif</file>
+    </qresource>
+</RCC>

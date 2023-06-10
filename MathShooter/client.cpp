@@ -8,11 +8,15 @@ Client::Client()
     initializationPlayersFlag = false;
     serverInitStartGameFlag = false;
 
+    countSecondBeforeStartGame = 0;
+
     { // обработка сокетов
         socket = new QTcpSocket(this);
         m_timer = new QTimer(this);
+        gameStartTimer = new QTimer(this);
 
         connect(m_timer, &QTimer::timeout, this, &Client::checkNetworkConfiguration);
+        connect(gameStartTimer, &QTimer::timeout, this, &Client::updateTimeStartGame);
         connect(socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
         connect(socket, &QTcpSocket::connected, this, &Client::connected);
         connect(socket, &QTcpSocket::disconnected, this, &Client::disconnected);
@@ -45,13 +49,34 @@ void Client::connectToTheHost(QString ip, int port)
 void Client::disconnectToTheHost()
 {
     m_timer->stop();
-    qDebug() << "END TIMER";
+    gameStartTimer->stop();
+    qDebug() << "END TIMER'S";
 
     initializationObstacleFlag = false;
     initializationPlayersFlag = false;
     serverInitStartGameFlag = false;
 
+    countSecondBeforeStartGame = 0;
+
     socket->disconnectFromHost();
+}
+
+void Client::sendToServerAddClient()
+{
+    QByteArray array;
+    QDataStream out(&array, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+
+    QString str = "StartNewClient";
+
+    out << str;
+
+    socket -> write(array);
+}
+
+int Client::getCountSecondsBeforeStartGame()
+{
+    return Client::TIME_WAITING_START_GAME - countSecondBeforeStartGame;
 }
 
 void Client::slotReadyRead()
@@ -63,10 +88,18 @@ void Client::slotReadyRead()
         if(serverInitStartGameFlag == false){
             QString str;
             input >> str;
+
             qDebug() << "STR: " << str;
             if(str == "serverInitStartGame"){
                 serverInitStartGameFlag = true;
+                gameStartTimer->start(1000);
                 emit serverInitStartGame();
+            }
+            else if(str == "connection timed out"){
+                emit serverMassageConnectTimeOut();
+            }
+            else if(str == "number of players exceeded"){
+                emit countPlayersExceeded();
             }
         }
         else if(initializationObstacleFlag == false){
@@ -104,6 +137,8 @@ void Client::slotReadyRead()
             initializationPlayersFlag = true;
 
             m_game->initGame(indestructibleObject, m_players);
+
+            emit beginToPlay();
         }
         else{
 //            QString str;
@@ -148,6 +183,20 @@ void Client::checkNetworkConfiguration()
         clientAddress = newClientAddress;
     }
     qDebug() << clientAddress;
+}
+
+void Client::updateTimeStartGame()
+{
+    if(countSecondBeforeStartGame <= Client::TIME_WAITING_START_GAME){
+        //qDebug() << "ekjvbnerlivbweljvbwebvlwjebvlkwefbvljwbvjwebfjlv";
+
+        emit signalUpdateTimeStartGame();
+        countSecondBeforeStartGame++;
+    }
+    else{
+        gameStartTimer->stop();
+        countSecondBeforeStartGame = 0;
+    }
 }
 
 void Client::SendToServer(QString str)
