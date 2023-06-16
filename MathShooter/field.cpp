@@ -283,6 +283,7 @@ void Field::setGroupPointsGraph()
             if(checkingOutside(dekartDotsGraph[idxPoint]) ||
                checkingIntersectionGraphWithObstracles(dekartDotsGraph[idxPoint])){
                 endDrawingGraph();
+                emit shotTimeEndSignal();
                 break;
             }
             else{

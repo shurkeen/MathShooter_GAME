@@ -39,6 +39,8 @@ MyBaseStackedWidget::MyBaseStackedWidget(QWidget* parent) : QWidget(parent){
     connect(myServer, &MyTcpServer::getServerNewPlayersStart, this, [this, thirdWaitingServerWidget]{ thirdWaitingServerWidget->countStartedLabelPlayers->setText("Count started players: " + QString::number(myServer->getCountStartedPlayers())); } );
     connect(myServer, &MyTcpServer::signalUpdateTimeStartGame, this, [this, thirdWaitingServerWidget]{ thirdWaitingServerWidget->timeBeforeStartGameLabel->setText("Time before start game: " + QString::number(myServer->getCountSecondsBeforeStartGame())); } );
     connect(myServer, &MyTcpServer::beginToPlay, this, [this]{ widgetsList->setFixedSize(Game::SIZE); this->widgetsList->setCurrentWidget(myServer->getGameWidget());} );
+    connect(myServer, &MyTcpServer::signalUpdateTimeNextMoveGame, this, [this]{ myServer->getGameWidget()->updateMoveTime(myServer->getCountSecondsBeforeMoveNextGame()); } );
+    connect(myClient, &Client::signalUpdateTimeNextMoveGame, this, [this]{ myClient->getGameWidget()->updateMoveTime(myClient->getCountSecondsBeforeMoveNextGame()); } );
     connect(myClient, &Client::beginToPlay, this, [this]{ widgetsList->setFixedSize(Game::SIZE); this->widgetsList->setCurrentWidget(myClient->getGameWidget());} );
     connect(myClient, &Client::signalUpdateTimeStartGame, this, [this, thirdWaitingClientWidget]{ thirdWaitingClientWidget->timeBeforeStartGameLabel->setText("Time before start game: " + QString::number(myClient->getCountSecondsBeforeStartGame())); } );
     connect(myClient, &Client::signalUpdateTimeStartGame, this, [this, secondConnectWidget]{ secondConnectWidget->timeBeforeStartGameLabel->setText("Time before start game: " + QString::number(myClient->getCountSecondsBeforeStartGame())); } );
@@ -357,5 +359,10 @@ MyThirdPageWaitingClientWidget::MyThirdPageWaitingClientWidget(QWidget *parent)
 
 MyThirdPageWaitingClientWidget::~MyThirdPageWaitingClientWidget()
 {
-
+    delete movieGifLabel;
+    delete timeBeforeStartGameLabel;
+    delete movieGif;
+    delete layoutThirdPage;
+    delete rightLabelTimeLayout;
+    delete middleMovieGifLayout;
 }

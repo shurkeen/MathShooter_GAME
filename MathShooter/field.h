@@ -36,6 +36,9 @@ public slots:
     void updateCoordGraph(const QVector<QPair<double, double>>& m_dots);
     void updateCountPlayers(int countPlayers);
 
+signals:
+    void shotTimeEndSignal();
+
 protected:
     void timerEvent(QTimerEvent*) override;
     void paintEvent(QPaintEvent*) override;

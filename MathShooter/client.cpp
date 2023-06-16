@@ -7,19 +7,62 @@ Client::Client()
     initializationObstacleFlag = false;
     initializationPlayersFlag = false;
     serverInitStartGameFlag = false;
+    initializationPlayerIdFlag = false;
 
     countSecondBeforeStartGame = 0;
 
     { // обработка сокетов
         socket = new QTcpSocket(this);
-        m_timer = new QTimer(this);
-        gameStartTimer = new QTimer(this);
 
-        connect(m_timer, &QTimer::timeout, this, &Client::checkNetworkConfiguration);
-        connect(gameStartTimer, &QTimer::timeout, this, &Client::updateTimeStartGame);
         connect(socket, &QTcpSocket::readyRead, this, &Client::slotReadyRead);
         connect(socket, &QTcpSocket::connected, this, &Client::connected);
         connect(socket, &QTcpSocket::disconnected, this, &Client::disconnected);
+    }
+
+    { // обработка вспомогательных данных
+        m_timer = new QTimer(this);
+        gameStartTimer = new QTimer(this);
+        moveTime = new QTimer(this);
+
+        connect(m_game, &Game::pushFireBtn, this, [this]{
+            moveTime -> stop();
+
+            countSecondBeforeNextMoveGame = 0;
+
+            QColor color(24, 222, 110);
+            int brightness = color.toHsv().value();
+            brightness *= 0.9;
+            color = QColor::fromHsv(color.hue(), color.saturation(), brightness);
+            this->m_game->setColorTimeText(color);
+
+            this->m_game->setFireFunction();
+
+            this->m_game->lockFireBtn();
+
+            sendFunctionToServer_Slot();
+        });
+
+        connect(this, &Client::serverPushFireBtn, this, [this]{
+            moveTime -> stop();
+
+            countSecondBeforeNextMoveGame = 0;
+
+            QColor color(24, 222, 110);
+            int brightness = color.toHsv().value();
+            brightness *= 0.9;
+            color = QColor::fromHsv(color.hue(), color.saturation(), brightness);
+            this->m_game->setColorTimeText(color);
+        });
+
+        connect(m_game, &Game::pushFireBtn, this, [this]{
+            this->m_game->startTimerGettingCoord();
+        });
+
+        connect(m_game, &Game::readyGettingCoord, this, &Client::sendToServerAddClientGettingCoord);
+
+        connect(m_timer, &QTimer::timeout, this, &Client::checkNetworkConfiguration);
+        connect(gameStartTimer, &QTimer::timeout, this, &Client::updateTimeStartGame);
+        connect(moveTime, &QTimer::timeout, this, &Client::moveTimeSlot);
     }
 }
 
@@ -55,8 +98,10 @@ void Client::disconnectToTheHost()
     initializationObstacleFlag = false;
     initializationPlayersFlag = false;
     serverInitStartGameFlag = false;
+    initializationPlayerIdFlag = false;
 
     countSecondBeforeStartGame = 0;
+    countSecondBeforeNextMoveGame = 0;
 
     socket->disconnectFromHost();
 }
@@ -77,6 +122,11 @@ void Client::sendToServerAddClient()
 int Client::getCountSecondsBeforeStartGame()
 {
     return Client::TIME_WAITING_START_GAME - countSecondBeforeStartGame;
+}
+
+int Client::getCountSecondsBeforeMoveNextGame()
+{
+    return Client::TIME_MOVING - countSecondBeforeNextMoveGame;
 }
 
 void Client::slotReadyRead()
@@ -137,13 +187,48 @@ void Client::slotReadyRead()
             initializationPlayersFlag = true;
 
             m_game->initGame(indestructibleObject, m_players);
+        }
+        else if(initializationPlayerIdFlag == false){
+            qDebug() << "IIIIIIIIIII";
+
+            int idPlayer;
+
+            input >> idPlayer;
+
+            this->idPlayer = idPlayer;
+
+            initializationPlayerIdFlag = true;
+
+            if(idPlayer == 0){
+                m_game->unlockFireBtn();
+            }
 
             emit beginToPlay();
+
+            moveTime -> start(1000);
         }
         else{
-//            QString str;
-//            in >> str;
-//            написать установление строки в нужное поле
+            QString str;
+            input >> str;
+
+            if(str == "Fire Graph"){
+                m_game->fireGraph();
+            }
+            else if(str == "start move time"){
+                moveTime -> start(1000);
+
+                idPlayer = (idPlayer + 1) % m_game->getCountPlayers();
+                if(idPlayer == 0){
+                    m_game->unlockFireBtn();
+                }
+
+                this->m_game->setColorTimeText(QColor(0, 0, 0));
+            }
+            else{
+                emit serverPushFireBtn();
+
+                m_game->startTimerGettingCoordForString(str);
+            }
         }
     }
     else{
@@ -188,22 +273,62 @@ void Client::checkNetworkConfiguration()
 void Client::updateTimeStartGame()
 {
     if(countSecondBeforeStartGame <= Client::TIME_WAITING_START_GAME){
-        //qDebug() << "ekjvbnerlivbweljvbwebvlwjebvlkwefbvljwbvjwebfjlv";
-
         emit signalUpdateTimeStartGame();
+
         countSecondBeforeStartGame++;
     }
     else{
         gameStartTimer->stop();
+
         countSecondBeforeStartGame = 0;
     }
 }
 
-void Client::SendToServer(QString str)
+void Client::sendFunctionToServer_Slot()
 {
     array.clear();
     QDataStream out(&array, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
-    out << str;
+
+    out << m_game->getFireFunction();
+
     socket->write(array);
+    socket->flush();
+
+    socket->waitForBytesWritten();
+}
+
+void Client::moveTimeSlot()
+{
+    if(countSecondBeforeNextMoveGame <= Client::TIME_MOVING){
+        emit signalUpdateTimeNextMoveGame();
+
+        countSecondBeforeNextMoveGame++;
+    }
+    else{
+        moveTime -> stop();
+        countSecondBeforeNextMoveGame = 0;
+
+        m_game->lockFireBtn();
+
+        idPlayer = (idPlayer + 1) % m_game->getCountPlayers();
+        if(idPlayer == 0){
+            m_game->unlockFireBtn();
+        }
+
+        moveTime -> start(1000);
+    }
+}
+
+void Client::sendToServerAddClientGettingCoord()
+{
+    QByteArray array;
+    QDataStream out(&array, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+
+    QString str = "ClientGettingCoord";
+
+    out << str;
+
+    socket -> write(array);
 }

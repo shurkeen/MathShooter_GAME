@@ -4,21 +4,61 @@ MyTcpServer::MyTcpServer(QObject *parent) : QObject(parent)
 {
     mTcpServer = new QTcpServer();
 
+    m_game = new Game;
+    countConnectedPlayers = 0;
+    countStartedPlayers = 0;
+    countSecondBeforeStartGame = 0;
+    countSecondBeforeNextMoveGame = 0;
+    countReadyPlayersFireGraph = 0;
+    slotNewConnectionPermit = true;
+
     checkNetworkConfiguration();
 
     connect(mTcpServer, &QTcpServer::newConnection, this, &MyTcpServer::slotNewConnection);
 
     m_timer = new QTimer(this);
     gameStartTimer = new QTimer(this);
+    moveTime = new QTimer(this);
 
+    connect(m_game, &Game::pushFireBtn, this, [this]{
+        moveTime -> stop();
+
+        countSecondBeforeNextMoveGame = 0;
+
+        QColor color(24, 222, 110);
+        int brightness = color.toHsv().value();
+        brightness *= 0.9;
+        color = QColor::fromHsv(color.hue(), color.saturation(), brightness);
+        this->m_game->setColorTimeText(color);
+
+        this->m_game->setFireFunction();
+
+        this->m_game->lockFireBtn();
+
+        sendFunctionToClients();
+    });
+
+    connect(this, &MyTcpServer::clientPushFireBtn, this, [this]{
+        moveTime -> stop();
+
+        countSecondBeforeNextMoveGame = 0;
+
+        QColor color(24, 222, 110);
+        int brightness = color.toHsv().value();
+        brightness *= 0.9;
+        color = QColor::fromHsv(color.hue(), color.saturation(), brightness);
+        this->m_game->setColorTimeText(color);
+    });
+
+    connect(m_game, &Game::pushFireBtn, this, [this]{
+        this->m_game->startTimerGettingCoord();
+    });
+
+    connect(m_game, &Game::readyGettingCoord, this, &MyTcpServer::addCountReadyPlayersFireGraph);
     connect(m_timer, &QTimer::timeout, this, &MyTcpServer::checkNetworkConfiguration);
     connect(gameStartTimer, &QTimer::timeout, this, &MyTcpServer::updateTimeStartGame);
-
-    m_game = new Game;
-    countConnectedPlayers = 0;
-    countStartedPlayers = 0;
-    countSecondBeforeStartGame = 0;
-    slotNewConnectionPermit = true;
+    connect(m_game, &Game::shotTimeEndSignal, this, &MyTcpServer::startMoveTimeClientAndServer);
+    connect(moveTime, &QTimer::timeout, this, &MyTcpServer::moveTimeSlot);
 }
 
 MyTcpServer::~MyTcpServer()
@@ -61,6 +101,8 @@ void MyTcpServer::serverEndListen()
         startedGamePlayersSocket.clear();
         gameStartTimer->stop();
         countSecondBeforeStartGame = 0;
+        countSecondBeforeNextMoveGame = 0;
+        countReadyPlayersFireGraph = 0;
         slotNewConnectionPermit = true;
         qDebug() << "server close";
     }
@@ -68,7 +110,7 @@ void MyTcpServer::serverEndListen()
 
 void MyTcpServer::initGame()
 {
-    m_game->initGame();
+    m_game->initGame(startedGamePlayersSocket.size());
 }
 
 void MyTcpServer::initClientStaticObject()
@@ -116,6 +158,37 @@ void MyTcpServer::initClientStaticObject()
             mVTcpSocket[to] -> flush();
         }
     }
+
+    std::this_thread::sleep_for(std::chrono::nanoseconds(100000000));
+
+    { // отправили информацию об очередности ходов игроков
+
+        QTime zerno(0, 0, 0);
+        QRandomGenerator generatorStartId(zerno.secsTo(QTime::currentTime()));
+        QVector<int > vecIdPlayers;
+
+        int add = generatorStartId.generate() % (mVTcpSocket.size() + 1);
+
+        idPlayer = add % (mVTcpSocket.size() + 1);
+
+        if(idPlayer == 0){
+            m_game->unlockFireBtn();
+        }
+
+        for(int j = 0; j < mVTcpSocket.size(); j++){
+            vecIdPlayers.push_back((j + add + 1) % (mVTcpSocket.size() + 1));
+        }
+
+        for(int to = 0; to < mVTcpSocket.size(); to++){
+            QByteArray array;
+            QDataStream stream(&array, QIODevice::ReadWrite);
+
+            stream << (int)vecIdPlayers[to];
+
+            mVTcpSocket[to] -> write(array);
+            mVTcpSocket[to] -> flush();
+        }
+    }
 }
 
 void MyTcpServer::startTimerChangeAddressServer()
@@ -151,6 +224,11 @@ int MyTcpServer::getCountStartedPlayers()
 int MyTcpServer::getCountSecondsBeforeStartGame()
 {
     return MyTcpServer::TIME_WAITING_START_GAME - countSecondBeforeStartGame;
+}
+
+int MyTcpServer::getCountSecondsBeforeMoveNextGame()
+{
+    return MyTcpServer::TIME_MOVING - countSecondBeforeNextMoveGame;
 }
 
 QString MyTcpServer::getServerAddress()
@@ -252,6 +330,30 @@ void MyTcpServer::slotServerRead()
                 startedGamePlayersSocket.push_back(mVTcpSocket[from]);
                 emit getServerNewPlayersStart();
             }
+            else if(str == "ClientGettingCoord"){
+                addCountReadyPlayersFireGraph();
+            }
+            else{
+                emit clientPushFireBtn();
+
+                {
+                    QByteArray array;
+                    QDataStream out(&array, QIODevice::WriteOnly);
+                    out.setVersion(QDataStream::Qt_6_2);
+
+                    out << str;
+
+                    for(int extra_from = 0; extra_from < mVTcpSocket.size(); extra_from++){
+                        if(extra_from != from){
+                            mVTcpSocket[extra_from] -> write(array);
+                            mVTcpSocket[extra_from] -> flush();
+                            mVTcpSocket[extra_from] -> waitForBytesWritten(1000);
+                        }
+                    }
+                }
+
+                m_game->startTimerGettingCoordForString(str);
+            }
         }
     }
 }
@@ -326,6 +428,107 @@ void MyTcpServer::updateTimeStartGame()
         mVTcpSocket = startedGamePlayersSocket;
         initClientStaticObject();
 
+        moveTime -> start(1000);
+
         emit beginToPlay();
     }
+}
+
+void MyTcpServer::sendFunctionToClients()
+{
+    {
+        QByteArray array;
+        QDataStream out(&array, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_6_2);
+
+        QString str = m_game->getFireFunction();
+
+        out << str;
+
+        for(int from = 0; from < mVTcpSocket.size(); from++){
+            mVTcpSocket[from] -> write(array);
+            mVTcpSocket[from] -> flush();
+            mVTcpSocket[from] -> waitForBytesWritten(1000);
+        }
+    }
+}
+
+void MyTcpServer::startMoveTimeClientAndServer()
+{
+    QByteArray array;
+    QDataStream out(&array, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+
+    QString str = "start move time";
+
+    out << str;
+
+    for(int from = 0; from < mVTcpSocket.size(); from++){
+        mVTcpSocket[from] -> write(array);
+        mVTcpSocket[from] -> flush();
+        mVTcpSocket[from] -> waitForBytesWritten(1000);
+    }
+
+    moveTime -> start(1000);
+
+    idPlayer = (idPlayer + 1) % m_game->getCountPlayers();
+    if(idPlayer == 0){
+        m_game->unlockFireBtn();
+    }
+
+    this->m_game->setColorTimeText(QColor(0, 0, 0));
+}
+
+void MyTcpServer::moveTimeSlot()
+{
+    if(countSecondBeforeNextMoveGame <= MyTcpServer::TIME_MOVING){
+        emit signalUpdateTimeNextMoveGame();
+
+        countSecondBeforeNextMoveGame++;
+    }
+    else{
+        moveTime -> stop();
+        countSecondBeforeNextMoveGame = 0;
+
+        m_game->lockFireBtn();
+
+        idPlayer = (idPlayer + 1) % m_game->getCountPlayers();
+        if(idPlayer == 0){
+            m_game->unlockFireBtn();
+        }
+
+        moveTime -> start(1000);
+    }
+}
+
+void MyTcpServer::checkCountReadyFireGraph()
+{
+    qDebug() << "EKLJBFCLJKHEBCVJHEWBFVJHBEV " << countReadyPlayersFireGraph << " " << countStartedPlayers;
+    if(countReadyPlayersFireGraph == countStartedPlayers + 1){
+        {
+            QByteArray arrayGo;
+            QDataStream outGo(&arrayGo, QIODevice::WriteOnly);
+            outGo.setVersion(QDataStream::Qt_6_2);
+
+            QString strGo = "Fire Graph";
+
+            outGo << strGo;
+
+            for(int from = 0; from < mVTcpSocket.size(); from++){
+                mVTcpSocket[from] -> write(arrayGo);
+                mVTcpSocket[from] -> flush();
+                mVTcpSocket[from] -> waitForBytesWritten(1000);
+            }
+        }
+
+        this->m_game->fireGraph();
+
+        countReadyPlayersFireGraph = 0;
+    }
+}
+
+void MyTcpServer::addCountReadyPlayersFireGraph()
+{
+    countReadyPlayersFireGraph++;
+    checkCountReadyFireGraph();
 }
